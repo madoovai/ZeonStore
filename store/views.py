@@ -1,4 +1,15 @@
 from django.views.generic import TemplateView
+from store.models import Product
+
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+
+class ProductsView(APIView):
+    def get(self, request):
+        products = Product.objects.all()
+        return Response({"products": products})
 
 
 class HomeView(TemplateView):
