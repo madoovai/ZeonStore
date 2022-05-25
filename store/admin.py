@@ -1,5 +1,5 @@
 from django.contrib import admin
-from store.models import Product, Collection, Color, SizeLine, ProductImage
+from store.models import Product, Collection, ProductColor, ProductSizeLine, ProductImage
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -11,11 +11,11 @@ class CollectionAdmin(admin.ModelAdmin):
 
 
 class ColorAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['product', 'color']
 
 
 class SizeLineAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['product', 'size']
 
 
 class ProductImageAdmin(admin.ModelAdmin):
@@ -24,6 +24,6 @@ class ProductImageAdmin(admin.ModelAdmin):
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Collection, CollectionAdmin)
-admin.site.register(Color, ColorAdmin)
-admin.site.register(SizeLine, SizeLineAdmin)
+admin.site.register(ProductColor, ColorAdmin)
+admin.site.register(ProductSizeLine, SizeLineAdmin)
 admin.site.register(ProductImage, ProductImageAdmin)
