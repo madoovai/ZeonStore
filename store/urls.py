@@ -16,16 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from store.views import HomeView, AboutView, CollectionView, NewsView, ProductsView
+from store.views import HomeView, AboutView, NewsView, ProductView
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('', HomeView.as_view(), name="home"),
-    path('products/', ProductsView.as_view()),
+    path('products/', ProductView.as_view()),
+    path('products/<int:pk>', ProductView.as_view()),
     path('about/', AboutView.as_view(), name="about"),
-    path('collection/', CollectionView.as_view(), name="collection"),
     path('news/', NewsView.as_view(), name="news"),
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
