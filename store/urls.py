@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from store.views import HomeView, AboutView, CollectionView, NewsView, ProductsView
 from django.conf import settings
@@ -28,6 +28,7 @@ urlpatterns = [
     path('collection/', CollectionView.as_view(), name="collection"),
     path('news/', NewsView.as_view(), name="news"),
     path('admin/', admin.site.urls),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -45,7 +45,6 @@ class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
     colors = models.ManyToManyField(Color, related_name="colors")
-    images = models.ImageField(upload_to='static/images')
     discount_price = models.IntegerField(verbose_name="Цена со скидкой")
     old_price = models.IntegerField(verbose_name="Цена без скидки")
     description = RichTextField()
@@ -63,6 +62,20 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name="Картинка")
+
+    def __str__(self):
+        return self.product.title
+
+    class Meta:
+        verbose_name = "Картинка"
+        verbose_name_plural = "Картинки"
+
+
 
 
 
