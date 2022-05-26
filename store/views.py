@@ -1,22 +1,18 @@
-from django.views.generic import TemplateView
+from rest_framework import viewsets
+from store.models import Product, Collection
+from store.serializers import ProductSerializer, CollectionSerializer
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
+class ProductViewSet(viewsets.ModelViewSet):
+
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
 
 
-class AboutView(TemplateView):
-    template_name = "about.html"
+class CollectionViewSet(viewsets.ModelViewSet):
 
-
-class CollectionView(TemplateView):
-    template_name = "collection.html"
-
-
-class NewsView(TemplateView):
-    template_name = "news.html"
-
-
+    serializer_class = CollectionSerializer
+    queryset = Collection.objects.all()
 
 
 

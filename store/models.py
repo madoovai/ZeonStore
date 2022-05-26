@@ -1,8 +1,11 @@
+from colorfield.fields import ColorField
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Collection(models.Model):
     title = models.CharField(max_length=200, verbose_name="Коллекция")
+    image = models.ImageField(blank=True, null=True, verbose_name="Картинка")
 
     def __str__(self):
         return self.title
@@ -12,33 +15,21 @@ class Collection(models.Model):
         verbose_name_plural = "Коллекции"
 
 
-class ProductStatusChoices(models.TextChoices):
-    SALESHIT = "sales_hit", "Saleshit"
-    LATEST = "latest", "Latest"
-
-
-class ProductColorChoices(models.TextChoices):
-    BLUE = "blue", "Blue"
-    GREEN = "green", "Green"
-    PINK = "pink", "Pink"
-
-
 class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
-    color = models.CharField(verbose_name="Цвет", max_length=20,
-                             choices=ProductColorChoices.choices, default=ProductColorChoices.BLUE, blank=True, null=True)
     discount_price = models.IntegerField(verbose_name="Цена со скидкой")
     old_price = models.IntegerField(verbose_name="Цена без скидки")
-    description = models.CharField(max_length=500, verbose_name="Описание товара")
-    size_line = models.IntegerField(verbose_name="Размерный ряд")
-    fabric_structure = models.CharField(max_length=100, verbose_name="Состав ткани")
-    amount_of_product = models.IntegerField(verbose_name="Количество")
-    size = models.IntegerField(verbose_name="Размер")
+    description = RichTextField(verbose_name="Описание")
+    fabric_structure = models.CharField(verbose_name="Состав ткани", max_length=100, null=True)
+    fabric = models.CharField(verbose_name="Материал", max_length=100, null=True)
     discount = models.IntegerField(verbose_name="Скидка")
+    size_line = models.CharField(verbose_name="Размерный ряд", max_length=10, null=True)
+    product_amount = models.IntegerField(verbose_name="Количество в линейке", null=True, blank=True)
     collection = models.ForeignKey(Collection, verbose_name="Коллекция", on_delete=models.CASCADE)
-    status = models.CharField(verbose_name="Статус", choices=ProductStatusChoices.choices, max_length=20, default=None,
-                              null=True, blank=True)
+    hit = models.BooleanField(verbose_name="Хит продаж", blank=True, null=True)
+    latest = models.BooleanField(verbose_name="Новинки", blank=True, null=True)
+    favorite = models.BooleanField(verbose_name="Избранное", blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -47,6 +38,29 @@ class Product(models.Model):
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
 
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name="Картинка")
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        verbose_name = "Картинка"
+        verbose_name_plural = "Картинки"
+
+
+class ProductColor(models.Model):
+    image = models.ForeignKey(ProductImage, related_name='colors', verbose_name="Картинка", on_delete=models.CASCADE, null=True)
+    color = ColorField(verbose_name="Цвет", default='#FF0000')
+
+    def __str__(self):
+        return self.color
+
+    class Meta:
+        verbose_name = "Цвет"
+        verbose_name_plural = "Цвета"
 
 
 
