@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200, verbose_name='Коллекция')),
-                ('images', models.ImageField(blank=True, null=True, upload_to='static/images')),
+                ('image', models.ImageField(verbose_name="Картинка")),
             ],
             options={
                 'verbose_name': 'Коллекция',
