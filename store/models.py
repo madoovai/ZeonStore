@@ -1,10 +1,11 @@
+from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
 
 
 class Collection(models.Model):
     title = models.CharField(max_length=200, verbose_name="Коллекция")
-    images = models.ImageField(upload_to='static/images', blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, verbose_name="Картинка")
 
     def __str__(self):
         return self.title
@@ -14,22 +15,20 @@ class Collection(models.Model):
         verbose_name_plural = "Коллекции"
 
 
-class ProductStatusChoices(models.TextChoices):
-    SALESHIT = "sales_hit", "Saleshit"
-    LATEST = "latest", "Latest"
-
-
 class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
     discount_price = models.IntegerField(verbose_name="Цена со скидкой")
     old_price = models.IntegerField(verbose_name="Цена без скидки")
     description = RichTextField(verbose_name="Описание")
-    fabric_structure = RichTextField(verbose_name="Состав ткани")
+    fabric_structure = models.CharField(verbose_name="Состав ткани", max_length=100, null=True)
+    fabric = models.CharField(verbose_name="Материал", max_length=100, null=True)
     discount = models.IntegerField(verbose_name="Скидка")
+    size_line = models.CharField(verbose_name="Размерный ряд", max_length=10, null=True)
+    product_amount = models.IntegerField(verbose_name="Количество в линейке", null=True, blank=True)
     collection = models.ForeignKey(Collection, verbose_name="Коллекция", on_delete=models.CASCADE)
-    status = models.CharField(verbose_name="Статус", choices=ProductStatusChoices.choices, max_length=20, default=None,
-                              null=True, blank=True)
+    hit = models.BooleanField(verbose_name="Хит продаж", blank=True, null=True)
+    latest = models.BooleanField(verbose_name="Новинки", blank=True, null=True)
     favorite = models.BooleanField(verbose_name="Избранное", blank=True, null=True)
 
     def __str__(self):
@@ -45,31 +44,19 @@ class ProductImage(models.Model):
     image = models.ImageField(verbose_name="Картинка")
 
     def __str__(self):
-        return self.product.title
+        return self.image.name
 
     class Meta:
         verbose_name = "Картинка"
         verbose_name_plural = "Картинки"
 
 
-class ProductSizeLine(models.Model):
-    product = models.ForeignKey(Product, related_name='sizelines', verbose_name="Товар", on_delete=models.CASCADE)
-    size = models.CharField(max_length=4, verbose_name="Размер", blank=True, null=True)
-
-    def __str__(self):
-        return self.product.title
-
-    class Meta:
-        verbose_name = "Размерный ряд"
-        verbose_name_plural = "Размерные ряды"
-
-
 class ProductColor(models.Model):
-    product = models.ForeignKey(Product, related_name='colors', verbose_name="Товар", on_delete=models.CASCADE)
-    color = models.CharField(max_length=20, verbose_name="Цвет")
+    image = models.ForeignKey(ProductImage, related_name='colors', verbose_name="Картинка", on_delete=models.CASCADE, null=True)
+    color = ColorField(verbose_name="Цвет", default='#FF0000')
 
     def __str__(self):
-        return self.product.title
+        return self.color
 
     class Meta:
         verbose_name = "Цвет"
