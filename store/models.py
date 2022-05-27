@@ -112,5 +112,16 @@ class News(models.Model):
         verbose_name_plural = "Новости"
 
 
+class Slyder(models.Model):
+    photo = models.ImageField(verbose_name="Фотография")
+    link = models.CharField(verbose_name="Ссылка", max_length=250, null=True, blank=True)
+
+    def __str__(self):
+        return self.photo.name
+
+    class Meta:
+        verbose_name = "Слайдер"
+
+
 
 

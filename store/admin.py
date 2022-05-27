@@ -1,5 +1,5 @@
 from django.contrib import admin
-from store.models import Product, Collection, ProductColor, ProductImage, AboutImage, About, OurAdvantage, News
+from store.models import Product, Collection, ProductColor, ProductImage, AboutImage, About, OurAdvantage, News, Slyder
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -34,6 +34,10 @@ class NewsAdmin(admin.ModelAdmin):
     list_display = ['headline', 'description', 'photo']
 
 
+class SlyderAdmin(admin.ModelAdmin):
+    list_display = ['photo', 'link']
+
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(ProductColor, ColorAdmin)
@@ -42,3 +46,5 @@ admin.site.register(AboutImage, AboutImageAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
 admin.site.register(News, NewsAdmin)
+admin.site.register(Slyder, SlyderAdmin)
+
