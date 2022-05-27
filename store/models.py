@@ -86,4 +86,17 @@ class AboutImage(models.Model):
         verbose_name_plural = "Фотографии о нас"
 
 
+class OurAdvantage(models.Model):
+    icon = models.ImageField(verbose_name="Иконка")
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = models.CharField(max_length=200, verbose_name="Описание")
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Наше преимущество"
+        verbose_name_plural = "Наши преимущества"
+
+
 
