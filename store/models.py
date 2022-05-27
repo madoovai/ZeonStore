@@ -63,4 +63,27 @@ class ProductColor(models.Model):
         verbose_name_plural = "Цвета"
 
 
+class About(models.Model):
+    headline = models.CharField(verbose_name="Заголовок", max_length=50)
+    description = RichTextField()
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "О нас"
+
+
+class AboutImage(models.Model):
+    page = models.ForeignKey(About, related_name="images", verbose_name="Страница", null=True, on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name="Фотография", null=True)
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        verbose_name = "Фотография"
+        verbose_name_plural = "Фотографии о нас"
+
+
 
