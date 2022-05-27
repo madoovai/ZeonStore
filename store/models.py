@@ -99,4 +99,18 @@ class OurAdvantage(models.Model):
         verbose_name_plural = "Наши преимущества"
 
 
+class News(models.Model):
+    photo = models.ImageField(verbose_name="Фотография")
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = RichTextField()
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Новость"
+        verbose_name_plural = "Новости"
+
+
+
 

@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics
-from store.models import Product, Collection, About
-from store.serializers import ProductSerializer, CollectionSerializer, SimilarProductSerializer, AboutUsSerializer
+from store.models import Product, Collection, About, News
+from store.serializers import ProductSerializer, CollectionSerializer, SimilarProductSerializer, AboutUsSerializer, \
+    NewsSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -24,5 +25,11 @@ class AboutUsViewSet(viewsets.ModelViewSet):
 
     serializer_class = AboutUsSerializer
     queryset = About.objects.all()
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+
+    serializer_class = NewsSerializer
+    queryset = News.objects.all()
 
 
