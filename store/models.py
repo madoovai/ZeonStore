@@ -123,5 +123,14 @@ class Slyder(models.Model):
         verbose_name = "Слайдер"
 
 
+class PublicOffer(models.Model):
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = RichTextField()
 
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Публичная офферта"
+        verbose_name_plural = "Публичные офферты"
 

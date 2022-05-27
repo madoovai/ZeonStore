@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from store.models import Product, Collection, About, News
+from store.models import Product, Collection, About, News, PublicOffer
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -31,6 +31,12 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ('headline', 'description', 'photo')
+
+
+class PublicOfferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicOffer
+        fields = ('headline', 'description')
 
 
 
