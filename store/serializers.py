@@ -24,7 +24,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 class AboutUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = About
-        fields = ('headline', 'description')
+        fields = ('headline', 'description', 'image')
 
 
 class NewsSerializer(serializers.ModelSerializer):
@@ -37,6 +37,12 @@ class PublicOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicOffer
         fields = ('headline', 'description')
+
+
+class HelpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicOffer
+        fields = ('question', 'answer')
 
 
 
