@@ -38,6 +38,10 @@ class Product(models.Model):
         similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
 
+    def save(self, *args, **kwargs):
+        self.discount = 100 - (self.discount_price * 100 / self.old_price)
+        super(Product, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
