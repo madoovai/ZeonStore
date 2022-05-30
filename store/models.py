@@ -129,7 +129,7 @@ class News(models.Model):
         verbose_name_plural = "Новости"
 
 
-class Slyder(models.Model):
+class Slider(models.Model):
     photo = models.ImageField(verbose_name="Фотография")
     link = models.CharField(verbose_name="Ссылка", max_length=250, null=True, blank=True)
 
@@ -152,6 +152,17 @@ class PublicOffer(models.Model):
         verbose_name_plural = "Публичные офферты"
 
 
+class ImageHelp(models.Model):
+    image = models.ImageField(verbose_name="Фотография")
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        verbose_name = "Изображение для Помощь"
+        verbose_name_plural = "Изображение для Помощь"
+
+
 class Help(models.Model):
     question = models.CharField(max_length=200, verbose_name="Вопрос")
     answer = models.CharField(max_length=500, verbose_name="Ответ")
@@ -162,18 +173,6 @@ class Help(models.Model):
     class Meta:
         verbose_name = "Помощь"
         verbose_name_plural = "Помощь"
-
-
-class ImageHelp(models.Model):
-    page = models.ForeignKey(Help, related_name="images", verbose_name="Страница", null=True, on_delete=models.CASCADE)
-    image = models.ImageField(verbose_name="Фотография")
-
-    def __str__(self):
-        return self.image.name
-
-    class Meta:
-        verbose_name = "Изображение для Помощь"
-        verbose_name_plural = "Изображение для Помощь"
 
 
 
