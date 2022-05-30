@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage
+from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
+    Help
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -47,7 +48,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 class AboutImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AboutImage
-        fields = ['image']
+        fields = ('image')
 
 
 class AboutUsSerializer(serializers.ModelSerializer):
@@ -70,11 +71,17 @@ class PublicOfferSerializer(serializers.ModelSerializer):
         fields = ('headline', 'description')
 
 
-class HelpSerializer(serializers.ModelSerializer):
+class HelpImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PublicOffer
-        fields = ('question', 'answer')
+        model = ImageHelp
+        fields = ('__all__')
 
+
+class HelpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Help
+        fields = ('question', 'answer')
 
 
 
