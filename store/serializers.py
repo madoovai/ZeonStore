@@ -81,7 +81,7 @@ class HelpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Help
-        fields = ('question', 'answer')
+        fields = ('id', 'question', 'answer')
 
 
 
