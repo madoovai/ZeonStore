@@ -34,14 +34,35 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    def similar_products(self):
+        similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
+        return similar_products
+
+    def save(self, *args, **kwargs):
+        self.discount = 100 - (self.discount_price * 100 / self.old_price)
+        super(Product, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
 
 
+class Color(models.Model):
+    name = models.CharField(verbose_name="Название цвета", max_length=30)
+    rgb = ColorField(verbose_name="Цвет RGB")
+
+    def __str__(self):
+        return f"{self.name} ({self.rgb})"
+
+    class Meta:
+        verbose_name = "Цвет"
+        verbose_name_plural = "Цвета"
+
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
     image = models.ImageField(verbose_name="Картинка")
+    color = models.ForeignKey(Color, related_name="images", verbose_name="Цвет", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.image.name
@@ -59,8 +80,106 @@ class ProductColor(models.Model):
         return self.color
 
     class Meta:
-        verbose_name = "Цвет"
-        verbose_name_plural = "Цвета"
+        verbose_name = "Цвет товара"
+        verbose_name_plural = "Цвета товаров"
+
+
+class About(models.Model):
+    headline = models.CharField(verbose_name="Заголовок", max_length=50)
+    description = RichTextField()
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "О нас"
+
+
+class AboutImage(models.Model):
+    page = models.ForeignKey(About, related_name="images", verbose_name="Страница", null=True, on_delete=models.CASCADE)
+    image = models.ImageField(verbose_name="Фотография", null=True)
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        verbose_name = "Фотография"
+        verbose_name_plural = "Фотографии о нас"
+
+
+class OurAdvantage(models.Model):
+    icon = models.ImageField(verbose_name="Иконка")
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = models.CharField(max_length=200, verbose_name="Описание")
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Наше преимущество"
+        verbose_name_plural = "Наши преимущества"
+
+
+class News(models.Model):
+    photo = models.ImageField(verbose_name="Фотография")
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = RichTextField()
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Новость"
+        verbose_name_plural = "Новости"
+
+
+class Slider(models.Model):
+    photo = models.ImageField(verbose_name="Фотография")
+    link = models.CharField(verbose_name="Ссылка", max_length=250, null=True, blank=True)
+
+    def __str__(self):
+        return self.photo.name
+
+    class Meta:
+        verbose_name = "Слайдер"
+
+
+class PublicOffer(models.Model):
+    headline = models.CharField(max_length=20, verbose_name="Заголовок")
+    description = RichTextField()
+
+    def __str__(self):
+        return self.headline
+
+    class Meta:
+        verbose_name = "Публичная офферта"
+        verbose_name_plural = "Публичные офферты"
+
+
+class ImageHelp(models.Model):
+    image = models.ImageField(verbose_name="Фотография")
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        verbose_name = "Изображение для Помощь"
+        verbose_name_plural = "Изображение для Помощь"
+
+
+class Help(models.Model):
+    question = models.CharField(max_length=200, verbose_name="Вопрос")
+    answer = models.CharField(max_length=500, verbose_name="Ответ")
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        verbose_name = "Помощь"
+        verbose_name_plural = "Помощь"
+
+
+
 
 
 
