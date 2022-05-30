@@ -25,8 +25,14 @@ class ProductColorAdmin(admin.ModelAdmin):
     list_display = ['image', 'color']
 
 
+class AboutImageAdminInline(admin.TabularInline):
+    model = AboutImage
+    extra = 0
+    max_num = 3
+
+
 class AboutAdmin(admin.ModelAdmin):
-    pass
+    inlines = [AboutImageAdminInline]
 
 
 class AboutImageAdmin(admin.ModelAdmin):
@@ -61,7 +67,6 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(ProductColor, ProductColorAdmin)
 admin.site.register(Color, ColorAdmin)
-admin.site.register(AboutImage, AboutImageAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
 admin.site.register(News, NewsAdmin)

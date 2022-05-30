@@ -10,11 +10,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
 
 
-class SimilarProductViewSet(viewsets.ModelViewSet):
-    serializer_class = SimilarProductSerializer
-    queryset = Product.objects.filter()
-
-
 class CollectionViewSet(viewsets.ModelViewSet):
 
     serializer_class = CollectionSerializer
