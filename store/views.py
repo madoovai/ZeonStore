@@ -1,7 +1,11 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp
+from store.pagination import CollectionPagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
-    NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer
+    NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -11,9 +15,21 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
-
+    pagination_class = CollectionPagination
     serializer_class = CollectionSerializer
     queryset = Collection.objects.all()
+
+    @action(detail=True, methods=['get'], url_path='products')
+    def get_products_of_collection(self, request, pk):
+        products = Product.objects.filter(collection=pk)
+        serializer = CollectionProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='latest-products')
+    def get_latest_products_of_collection(self, request, pk):
+        latest_products = Product.objects.filter(collection=pk, latest=True)
+        serializer = CollectionProductSerializer(latest_products, many=True)
+        return Response(serializer.data)
 
 
 class AboutUsViewSet(viewsets.ModelViewSet):

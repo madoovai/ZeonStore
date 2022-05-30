@@ -17,6 +17,15 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('image', 'color')
 
 
+class CollectionProductSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
+                  'favorite', 'images')
+
+
 class SimilarProductSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
 
@@ -40,6 +49,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CollectionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Collection
         fields = ('id', 'title', 'image')
