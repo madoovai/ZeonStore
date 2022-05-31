@@ -1,7 +1,7 @@
 from rest_framework import pagination
 
 
-class CollectionProductsPagination(pagination.PageNumberPagination):
+class TwelvePagination(pagination.PageNumberPagination):
     page_size = 12
 
 

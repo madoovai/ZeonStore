@@ -36,6 +36,17 @@ class SimilarProductSerializer(serializers.ModelSerializer):
                   'favorite', 'images')
 
 
+class FavoriteProductSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True)
+    colors = ColorSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
+                  'favorite', 'images', 'colors')
+        #сериализатор для избранных товаров
+
+
 class ProductSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
     similar_products = SimilarProductSerializer(many=True)
