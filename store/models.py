@@ -15,9 +15,22 @@ class Collection(models.Model):
         verbose_name_plural = "Коллекции"
 
 
+class Color(models.Model):
+    name = models.CharField(verbose_name="Название цвета", max_length=30)
+    rgb = ColorField(verbose_name="Цвет RGB")
+
+    def __str__(self):
+        return f"{self.name} ({self.rgb})"
+
+    class Meta:
+        verbose_name = "Цвет"
+        verbose_name_plural = "Цвета"
+
+
 class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
+    colors = models.ManyToManyField(Color, verbose_name="Цвета")
     discount_price = models.IntegerField(verbose_name="Цена со скидкой")
     old_price = models.IntegerField(verbose_name="Цена без скидки")
     description = RichTextField(verbose_name="Описание")
@@ -38,10 +51,6 @@ class Product(models.Model):
         similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
 
-    def collection_products(self):
-        collection_products = Product.objects.filter(collection=self.collection)
-        return collection_products
-
     def save(self, *args, **kwargs):
         self.discount = 100 - (self.discount_price * 100 / self.old_price)
         super(Product, self).save(*args, **kwargs)
@@ -49,18 +58,6 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
-
-
-class Color(models.Model):
-    name = models.CharField(verbose_name="Название цвета", max_length=30)
-    rgb = ColorField(verbose_name="Цвет RGB")
-
-    def __str__(self):
-        return f"{self.name} ({self.rgb})"
-
-    class Meta:
-        verbose_name = "Цвет"
-        verbose_name_plural = "Цвета"
 
 
 class ProductImage(models.Model):
