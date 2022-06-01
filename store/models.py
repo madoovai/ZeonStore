@@ -51,6 +51,14 @@ class Product(models.Model):
         similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
 
+    def hit_sale_products(self):
+        hit_sale_products = Product.objects.filter(hit=True)
+        return hit_sale_products
+
+    def latest_products(self):
+        latest_products = Product.objects.filter(latest=True)
+        return latest_products
+
     def save(self, *args, **kwargs):
         self.discount = 100 - (self.discount_price * 100 / self.old_price)
         super(Product, self).save(*args, **kwargs)
@@ -92,6 +100,8 @@ class Bag(models.Model):
         self.title = product.title
         self.size_line = product.size_line
         super(Bag, self).save(*args, **kwargs)
+        #метод для стягивания полей(цены, название, резмер) с продукта, который пришел в запросе
+        #и сохранение в модели Корзина
 
     class Meta:
         verbose_name = "Корзина"

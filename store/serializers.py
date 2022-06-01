@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, Bag
+    Help, Bag, Slider
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -115,5 +115,50 @@ class HelpSerializer(serializers.ModelSerializer):
         model = Help
         fields = ('id', 'question', 'answer')
 
+
+class SliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Slider
+        fields = ('photo', 'link')
+
+
+class HitSaleProductsSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True)
+    colors = ColorSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
+                  'favorite', 'images', 'colors')
+
+
+class LatestProductsSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True)
+    colors = ColorSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
+                  'favorite', 'images', 'colors')
+
+
+class OurAdvantagesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ('icon', 'headline', 'description')
+
+
+class MainPageSerializer(serializers.ModelSerializer):
+    slider = SliderSerializer()
+    hit_sale_products = HitSaleProductsSerializer(many=True)
+    latest_products = LatestProductsSerializer(many=True)
+    collections = CollectionSerializer(many=True)
+    our_advantages = OurAdvantagesSerializer(many=True)
+
+    class Meta:
+        fields = ('slider', 'hit_sale_products', 'latest_products',
+                  'collections', 'our_advantages')
+#сериализатор для блоков Слайдер, Хит продаж, Новинка, Наши преимущества и Коллекции
 
 

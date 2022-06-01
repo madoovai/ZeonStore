@@ -4,11 +4,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag
+from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag, Slider, OurAdvantage
 from store.pagination import TwelvePagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
-    FavoriteProductSerializer, BagProductsSerializer
+    FavoriteProductSerializer, BagProductsSerializer, SliderSerializer, HitSaleProductsSerializer, \
+    LatestProductsSerializer, OurAdvantagesSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -98,5 +99,37 @@ class HelpViewSet(viewsets.ModelViewSet):
             image_serializer = HelpImageSerializer(instance=help_image)
             response.data["image"] = image_serializer.data
         return response
+
+
+class SliderViewSet(viewsets.ModelViewSet):
+
+    serializer_class = SliderSerializer
+    queryset = Slider.objects.all()
+
+
+class HitSaleProductsViewSet(viewsets.ModelViewSet):
+
+    serializer_class = HitSaleProductsSerializer
+    queryset = Product.objects.all()
+
+
+class LatestProductsViewSet(viewsets.ModelViewSet):
+
+    serializer_class = LatestProductsSerializer
+    queryset = Product.objects.all()
+
+
+class OurAdvantagesViewSet(viewsets.ModelViewSet):
+
+    serializer_class = OurAdvantagesSerializer
+    queryset = OurAdvantage.objects.all()
+
+
+class MainPageApiViewSet(viewsets.ModelViewSet):
+
+    serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
+                        CollectionSerializer, OurAdvantagesSerializer]
+
+
 
 
