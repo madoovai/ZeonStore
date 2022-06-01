@@ -2,6 +2,8 @@ from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
 
+from store.validators import validate_file_extension
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=200, verbose_name="Коллекция")
@@ -108,7 +110,6 @@ class Bag(models.Model):
         verbose_name_plural = "Корзина"
 
 
-
 class About(models.Model):
     headline = models.CharField(verbose_name="Заголовок", max_length=50)
     description = RichTextField()
@@ -133,7 +134,8 @@ class AboutImage(models.Model):
 
 
 class OurAdvantage(models.Model):
-    icon = models.ImageField(verbose_name="Иконка")
+    icon = models.FileField(verbose_name="Иконка", validators=[validate_file_extension])
+    #валидатор по формату загружаемоего файла, допустимо только .svg or .png
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = models.CharField(max_length=200, verbose_name="Описание")
 
