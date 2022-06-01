@@ -73,16 +73,30 @@ class ProductImage(models.Model):
         verbose_name_plural = "Картинки"
 
 
-class ProductColor(models.Model):
-    image = models.ForeignKey(ProductImage, related_name='colors', verbose_name="Картинка", on_delete=models.CASCADE, null=True)
-    color = ColorField(verbose_name="Цвет", default='#FF0000')
+class Bag(models.Model):
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    amount_of_product = models.IntegerField(verbose_name="Количество линеек")
+    color_id = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
+    old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    title = models.CharField(verbose_name="Название", max_length=50, null=True)
+    size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
 
     def __str__(self):
-        return self.color
+        return self.product_id.title
+
+    def save(self, *args, **kwargs):
+        product = Product.objects.get(id=self.product_id.id)
+        self.old_price = product.old_price
+        self.discount_price = product.discount_price
+        self.title = product.title
+        self.size_line = product.size_line
+        super(Bag, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Цвет товара"
-        verbose_name_plural = "Цвета товаров"
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзина"
+
 
 
 class About(models.Model):

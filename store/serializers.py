@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help
+    Help, Bag
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -49,15 +49,25 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
+    colors = ColorSerializer(many=True)
     similar_products = SimilarProductSerializer(many=True)
 
     class Meta:
         model = Product
         fields = (
             'id', 'title', 'articul', 'discount_price', 'old_price', 'fabric_structure',
-            'fabric', 'discount', 'size_line', 'product_amount', 'collection', 'hit', 'latest', 'favorite',
+            'fabric', 'discount', 'size_line', 'product_amount', 'collection', 'hit', 'latest', 'favorite', 'colors',
             'images', 'similar_products'
         )
+
+
+class BagProductsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Bag
+        fields = ('id', 'product_id', 'amount_of_product', 'color_id', 'title',
+                  'size_line', 'old_price', 'discount_price')
+#сериалайзер для Корзины
 
 
 class CollectionSerializer(serializers.ModelSerializer):
