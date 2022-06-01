@@ -92,6 +92,8 @@ class Bag(models.Model):
         self.title = product.title
         self.size_line = product.size_line
         super(Bag, self).save(*args, **kwargs)
+        #метод для стягивания полей(цены, название, резмер) с продукта, который пришел в запросе
+        #и сохранение в модели Корзина
 
     class Meta:
         verbose_name = "Корзина"
