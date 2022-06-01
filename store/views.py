@@ -4,17 +4,24 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp
+from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag
 from store.pagination import TwelvePagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
-    FavoriteProductSerializer
+    FavoriteProductSerializer, BagProductsSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
 
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
+
+
+class BagProductViewSet(viewsets.ModelViewSet):
+
+    serializer_class = BagProductsSerializer
+    queryset = Bag.objects.all()
+#viewset для Корзины
 
 
 def random_products():
@@ -36,7 +43,7 @@ class FavoriteProductViewSet(viewsets.ModelViewSet):
         else:
             return queryset
     #viewset для отображения Избранных товаров в API с проверкой если товаров в Избранном нет,
-    # то вызывается метод для рандомных товаров (метод находится выше)
+    #то вызывается метод для рандомных товаров (метод находится выше)
     # + пагинация 12
 
 

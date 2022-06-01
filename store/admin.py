@@ -1,6 +1,6 @@
 from django.contrib import admin
-from store.models import Product, Collection, ProductColor, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider
+from store.models import Product, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
+    PublicOffer, Help, ImageHelp, Color, Slider, Bag
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -21,14 +21,14 @@ class ColorAdmin(admin.ModelAdmin):
     list_display = ['name', 'rgb']
 
 
-class ProductColorAdmin(admin.ModelAdmin):
-    list_display = ['image', 'color']
-
-
 class AboutImageAdminInline(admin.TabularInline):
     model = AboutImage
     extra = 0
     max_num = 3
+
+
+class BagAdmin(admin.ModelAdmin):
+    list_display = ['product_id', 'amount_of_product']
 
 
 class AboutAdmin(admin.ModelAdmin):
@@ -65,8 +65,8 @@ class ImageHelpAdmin(admin.ModelAdmin):
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Collection, CollectionAdmin)
-admin.site.register(ProductColor, ProductColorAdmin)
 admin.site.register(Color, ColorAdmin)
+admin.site.register(Bag, BagAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
 admin.site.register(News, NewsAdmin)
