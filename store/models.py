@@ -84,26 +84,31 @@ class ProductImage(models.Model):
 
 
 class Bag(models.Model):
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     amount_of_product = models.IntegerField(verbose_name="Количество линеек")
-    color_id = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
     old_price = models.IntegerField(verbose_name="Старая цена", null=True)
     discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
     title = models.CharField(verbose_name="Название", max_length=50, null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
+    image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.product_id.title
+        return self.product.title
 
     def save(self, *args, **kwargs):
-        product = Product.objects.get(id=self.product_id.id)
+        '''
+        метод для стягивания полей(цены, название, резмер, фото) с продукта,
+        который пришел в запросе и сохранение объекта в модели Корзина
+        '''
+        product = self.product
+        image = ProductImage.objects.get(product=self.product, color=self.color)
         self.old_price = product.old_price
         self.discount_price = product.discount_price
         self.title = product.title
         self.size_line = product.size_line
+        self.image = image
         super(Bag, self).save(*args, **kwargs)
-        #метод для стягивания полей(цены, название, резмер) с продукта, который пришел в запросе
-        #и сохранение в модели Корзина
 
     class Meta:
         verbose_name = "Корзина"
