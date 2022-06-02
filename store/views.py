@@ -125,10 +125,11 @@ class OurAdvantagesViewSet(viewsets.ModelViewSet):
     queryset = OurAdvantage.objects.all()
 
 
-class MainPageApiViewSet(viewsets.ModelViewSet):
+# class MainPageApiViewSet(viewsets.ModelViewSet):
+#     pass
 
-    serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
-                        CollectionSerializer, OurAdvantagesSerializer]
+    # serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
+    #                     CollectionSerializer, OurAdvantagesSerializer]
 
 
 
