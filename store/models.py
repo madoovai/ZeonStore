@@ -2,6 +2,8 @@ from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
 
+from store.validators import validate_file_extension
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=200, verbose_name="Коллекция")
@@ -51,6 +53,14 @@ class Product(models.Model):
         similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
 
+    def hit_sale_products(self):
+        hit_sale_products = Product.objects.filter(hit=True)
+        return hit_sale_products
+
+    def latest_products(self):
+        latest_products = Product.objects.filter(latest=True)
+        return latest_products
+
     def save(self, *args, **kwargs):
         self.discount = 100 - (self.discount_price * 100 / self.old_price)
         super(Product, self).save(*args, **kwargs)
@@ -73,16 +83,31 @@ class ProductImage(models.Model):
         verbose_name_plural = "Картинки"
 
 
-class ProductColor(models.Model):
-    image = models.ForeignKey(ProductImage, related_name='colors', verbose_name="Картинка", on_delete=models.CASCADE, null=True)
-    color = ColorField(verbose_name="Цвет", default='#FF0000')
+class Bag(models.Model):
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    amount_of_product = models.IntegerField(verbose_name="Количество линеек")
+    color_id = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
+    old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    title = models.CharField(verbose_name="Название", max_length=50, null=True)
+    size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
 
     def __str__(self):
-        return self.color
+        return self.product_id.title
+
+    def save(self, *args, **kwargs):
+        product = Product.objects.get(id=self.product_id.id)
+        self.old_price = product.old_price
+        self.discount_price = product.discount_price
+        self.title = product.title
+        self.size_line = product.size_line
+        super(Bag, self).save(*args, **kwargs)
+        #метод для стягивания полей(цены, название, резмер) с продукта, который пришел в запросе
+        #и сохранение в модели Корзина
 
     class Meta:
-        verbose_name = "Цвет товара"
-        verbose_name_plural = "Цвета товаров"
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзина"
 
 
 class About(models.Model):
@@ -109,7 +134,8 @@ class AboutImage(models.Model):
 
 
 class OurAdvantage(models.Model):
-    icon = models.ImageField(verbose_name="Иконка")
+    icon = models.FileField(verbose_name="Иконка", validators=[validate_file_extension])
+    #валидатор по формату загружаемоего файла, допустимо только .svg or .png
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = models.CharField(max_length=200, verbose_name="Описание")
 
