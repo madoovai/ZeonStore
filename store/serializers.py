@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, Bag, Slider, Order
+    Help, Bag, Slider, Order, OurAdvantage
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -155,21 +155,7 @@ class LatestProductsSerializer(serializers.ModelSerializer):
 class OurAdvantagesSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Product
+        model = OurAdvantage
         fields = ('icon', 'headline', 'description')
-
-
-class MainPageSerializer(serializers.ModelSerializer):
-    slider = SliderSerializer()
-    hit_sale_products = HitSaleProductsSerializer(many=True)
-    latest_products = LatestProductsSerializer(many=True)
-    collections = CollectionSerializer(many=True)
-    our_advantages = OurAdvantagesSerializer(many=True)
-
-    class Meta:
-        pass
-        # fields = ('slider', 'hit_sale_products', 'latest_products',
-        #           'collections', 'our_advantages')
-#сериализатор для блоков Слайдер, Хит продаж, Новинка, Наши преимущества и Коллекции
 
 
