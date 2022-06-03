@@ -9,6 +9,12 @@ class EightPagination(pagination.PageNumberPagination):
     page_size = 8
 
 
+class FourPagination(pagination.PageNumberPagination):
+    page_size = 4
+
+
+
+
 
 
 
