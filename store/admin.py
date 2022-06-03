@@ -1,6 +1,6 @@
 from django.contrib import admin
 from store.models import Product, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider, Bag
+    PublicOffer, Help, ImageHelp, Color, Slider, Bag, Order
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -29,6 +29,11 @@ class AboutImageAdminInline(admin.TabularInline):
 
 class BagAdmin(admin.ModelAdmin):
     list_display = ['product_id', 'amount_of_product']
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['amount_of_products', 'total_number_of_products', 'total_price_without_discount',
+                    'total_price_with_discount', 'final_total_price']
 
 
 class AboutAdmin(admin.ModelAdmin):
@@ -67,6 +72,7 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Color, ColorAdmin)
 admin.site.register(Bag, BagAdmin)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
 admin.site.register(News, NewsAdmin)
