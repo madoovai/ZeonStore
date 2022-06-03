@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag, Slider, OurAdvantage, \
     Order
-from store.pagination import TwelvePagination
+from store.pagination import TwelvePagination, EightPagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
     FavoriteProductSerializer, BagProductsSerializer, SliderSerializer, HitSaleProductsSerializer, \
@@ -40,6 +40,11 @@ def random_products():
 
 
 class FavoriteProductViewSet(viewsets.ModelViewSet):
+    '''
+    отображение Избранных товаров в API с проверкой если товаров в Избранном нет,
+    то вызывается метод для рандомных товаров (метод находится выше)
+    + пагинация 12
+    '''
     queryset = Product.objects.filter(favorite=True)
     serializer_class = FavoriteProductSerializer
     pagination_class = TwelvePagination
@@ -50,14 +55,13 @@ class FavoriteProductViewSet(viewsets.ModelViewSet):
             return random_products()
         else:
             return queryset
-    #viewset для отображения Избранных товаров в API с проверкой если товаров в Избранном нет,
-    #то вызывается метод для рандомных товаров (метод находится выше)
-    # + пагинация 12
+
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionSerializer
     queryset = Collection.objects.all()
+    pagination_class = EightPagination
 
     @action(detail=True, methods=['get'], url_path='products')
     def get_products_of_collection(self, request, pk):
@@ -118,25 +122,20 @@ class HitSaleProductsViewSet(viewsets.ModelViewSet):
 
     serializer_class = HitSaleProductsSerializer
     queryset = Product.objects.all()
+    pagination_class = EightPagination
 
 
 class LatestProductsViewSet(viewsets.ModelViewSet):
 
     serializer_class = LatestProductsSerializer
     queryset = Product.objects.all()
+    pagination_class = EightPagination
 
 
 class OurAdvantagesViewSet(viewsets.ModelViewSet):
 
     serializer_class = OurAdvantagesSerializer
     queryset = OurAdvantage.objects.all()
-
-
-# class MainPageApiViewSet(viewsets.ModelViewSet):
-#     pass
-
-    # serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
-    #                     CollectionSerializer, OurAdvantagesSerializer]
 
 
 
