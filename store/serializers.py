@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, Bag, Slider
+    Help, Bag, Slider, Order
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -66,9 +66,18 @@ class BagProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bag
-        fields = ('id', 'product_id', 'amount_of_product', 'color_id', 'title',
-                  'size_line', 'old_price', 'discount_price')
+        fields = ('id', 'product', 'amount_of_product', 'color', 'title',
+                  'size_line', 'old_price', 'discount_price', 'image')
 #сериалайзер для Корзины
+
+
+class OrderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Order
+        fields = ('amount_of_products', 'total_number_of_products')
+        # 'total_price_without_discount',
+        # 'total_price_with_discount', 'final_total_price'
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -81,7 +90,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 class AboutImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AboutImage
-        fields = ('image')
+        fields = ('image',)
 
 
 class AboutUsSerializer(serializers.ModelSerializer):
@@ -107,7 +116,7 @@ class PublicOfferSerializer(serializers.ModelSerializer):
 class HelpImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageHelp
-        fields = ('__all__')
+        fields = ('__all__',)
 
 
 class HelpSerializer(serializers.ModelSerializer):
@@ -158,8 +167,9 @@ class MainPageSerializer(serializers.ModelSerializer):
     our_advantages = OurAdvantagesSerializer(many=True)
 
     class Meta:
-        fields = ('slider', 'hit_sale_products', 'latest_products',
-                  'collections', 'our_advantages')
+        pass
+        # fields = ('slider', 'hit_sale_products', 'latest_products',
+        #           'collections', 'our_advantages')
 #сериализатор для блоков Слайдер, Хит продаж, Новинка, Наши преимущества и Коллекции
 
 

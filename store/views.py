@@ -4,12 +4,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag, Slider, OurAdvantage
+from store.models import Product, Collection, About, News, PublicOffer, Help, ImageHelp, Bag, Slider, OurAdvantage, \
+    Order
 from store.pagination import TwelvePagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
     FavoriteProductSerializer, BagProductsSerializer, SliderSerializer, HitSaleProductsSerializer, \
-    LatestProductsSerializer, OurAdvantagesSerializer
+    LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,12 @@ class BagProductViewSet(viewsets.ModelViewSet):
     serializer_class = BagProductsSerializer
     queryset = Bag.objects.all()
 #viewset для Корзины
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all()
 
 
 def random_products():
@@ -125,10 +132,11 @@ class OurAdvantagesViewSet(viewsets.ModelViewSet):
     queryset = OurAdvantage.objects.all()
 
 
-class MainPageApiViewSet(viewsets.ModelViewSet):
+# class MainPageApiViewSet(viewsets.ModelViewSet):
+#     pass
 
-    serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
-                        CollectionSerializer, OurAdvantagesSerializer]
+    # serializer_class = [SliderSerializer, HitSaleProductsSerializer, LatestProductsViewSet,
+    #                     CollectionSerializer, OurAdvantagesSerializer]
 
 
 
