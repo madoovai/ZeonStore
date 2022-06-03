@@ -2,6 +2,7 @@ from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
 from django.db.models import Sum
+from django.utils.translation import gettext_lazy as _
 
 from store.validators import validate_file_extension
 
@@ -149,6 +150,30 @@ class Order(models.Model):
         verbose_name_plural = "Заказы"
 
 
+class User(models.Model):
+    ORDER_STATUSES = (
+        ("new", _("Новый")),
+        ("order_done", _("Оформлен")),
+        ("cancelled", _("Отменен")),
+    )
+
+    name = models.CharField(verbose_name="Имя", max_length=50)
+    last_name = models.CharField(verbose_name="Фамилия", max_length=50)
+    email = models.CharField(verbose_name="Электронная почта", max_length=50)
+    phone_number = models.IntegerField(verbose_name="Номер телефона")
+    country = models.CharField(verbose_name="Страна", max_length=50)
+    city = models.CharField(verbose_name="Город", max_length=50)
+    order_date = models.DateField(verbose_name="Дата оформления")
+    order_status = models.CharField(verbose_name="Статус заказа", max_length=50, choices=ORDER_STATUSES, default="new")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+
+
 class About(models.Model):
     headline = models.CharField(verbose_name="Заголовок", max_length=50)
     description = RichTextField()
@@ -158,6 +183,7 @@ class About(models.Model):
 
     class Meta:
         verbose_name = "О нас"
+        verbose_name_plural = "О нас"
 
 
 class AboutImage(models.Model):
