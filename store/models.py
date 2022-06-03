@@ -1,6 +1,7 @@
 from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
+from django.db.models import Sum
 
 from store.validators import validate_file_extension
 
@@ -110,9 +111,42 @@ class Bag(models.Model):
         self.image = image
         super(Bag, self).save(*args, **kwargs)
 
+    def total_number_of_products(self):
+        '''
+        Расчет общего колво товаров исходя из колво линеек в Корзине
+        :return: total_number_of_products
+        '''
+        product = self.product
+        self.amount_of_product = Bag.objects.get(product=product)
+        total_number_of_products = product.product_amount * self.amount_of_product
+        return total_number_of_products
+
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
+
+
+class Order(models.Model):
+    amount_of_products = models.IntegerField(verbose_name="Количество линеек")
+    total_number_of_products = models.IntegerField(verbose_name="Количество товаров")
+    total_price_without_discount = models.IntegerField(verbose_name="Общая цена без скидки")
+    total_price_with_discount = models.IntegerField(verbose_name="Общая цена со скидкой")
+    final_total_price = models.IntegerField(verbose_name="Итого цена")
+
+    def __str__(self):
+        return self.id
+
+    def save(self, *args, **kwargs):
+        '''
+        Метод для оформления заказа, стягивание и суммирование данных с Корзины
+        '''
+        self.amount_of_products = Bag.objects.aggregate(Sum('amount_of_product')).get('amount_of_product__sum')
+        self.total_number_of_products = Bag.objects.aggregate(Sum(Bag.total_number_of_products(self.total_number_of_products)))
+        super(Order, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
 
 
 class About(models.Model):
