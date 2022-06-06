@@ -1,6 +1,6 @@
 from django.contrib import admin
-from store.models import Product, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider, Bag, Order, User
+from store.models import ProductLine, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
+    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, User, Footer, SecondFooter, OrderItem
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -9,7 +9,7 @@ class ImageAdminInline(admin.TabularInline):
     max_num = 8
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductLineAdmin(admin.ModelAdmin):
     inlines = [ImageAdminInline]
 
 
@@ -27,12 +27,18 @@ class AboutImageAdminInline(admin.TabularInline):
     max_num = 3
 
 
-class BagAdmin(admin.ModelAdmin):
-    list_display = ['product_id', 'amount_of_product']
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ['product', 'color', 'total_old_price', 'total_discount_price',
+                    'size_line', 'image', 'amount_of_productline']
+
+
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ['title', 'color', 'old_price', 'discount_price',
+                    'size_line', 'image', 'amount_of_productline']
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['amount_of_products', 'total_number_of_products', 'total_price_without_discount',
+    list_display = ['amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
                     'total_price_with_discount', 'final_total_price']
 
 
@@ -72,11 +78,23 @@ class ImageHelpAdmin(admin.ModelAdmin):
     list_display = ['image']
 
 
-admin.site.register(Product, ProductAdmin)
+class SecondFooterAdminInline(admin.TabularInline):
+    model = SecondFooter
+    extra = 0
+    readonly_fields = ['link']
+
+
+class FooterAdmin(admin.ModelAdmin):
+    inlines = [SecondFooterAdminInline]
+    list_display = ['text_info', 'phone_number']
+
+
+admin.site.register(ProductLine, ProductLineAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Color, ColorAdmin)
-admin.site.register(Bag, BagAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
@@ -85,5 +103,6 @@ admin.site.register(Slider, SliderAdmin)
 admin.site.register(PublicOffer, PublicOfferAdmin)
 admin.site.register(Help, HelpAdmin)
 admin.site.register(ImageHelp, ImageHelpAdmin)
+admin.site.register(Footer, FooterAdmin)
 
 

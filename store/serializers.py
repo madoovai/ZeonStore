@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from store.models import Product, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, Bag, Slider, Order, OurAdvantage
+from store.models import ProductLine, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
+    Help, ShoppingCart, Slider, Order, OurAdvantage
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class CollectionProductSerializer(serializers.ModelSerializer):
     colors = ColorSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
                   'favorite', 'images', 'colors')
 
@@ -32,7 +32,7 @@ class SimilarProductSerializer(serializers.ModelSerializer):
     colors = ColorSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line', 'collection',
                   'favorite', 'colors', 'images')
 
@@ -42,7 +42,7 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
     colors = ColorSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
                   'favorite', 'images', 'colors')
         #сериализатор для избранных товаров
@@ -54,7 +54,7 @@ class ProductSerializer(serializers.ModelSerializer):
     similar_products = SimilarProductSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = (
             'id', 'title', 'articul', 'discount_price', 'old_price', 'fabric_structure',
             'fabric', 'discount', 'size_line', 'product_amount', 'collection', 'hit', 'latest', 'favorite', 'colors',
@@ -62,12 +62,12 @@ class ProductSerializer(serializers.ModelSerializer):
         )
 
 
-class BagProductsSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Bag
-        fields = ('id', 'product', 'amount_of_product', 'color', 'title',
-                  'size_line', 'old_price', 'discount_price', 'image')
+        model = ShoppingCart
+        fields = ('id', 'product', 'amount_of_productline', 'color', 'title',
+                  'size_line', 'total_old_price', 'total_discount_price', 'image', 'order')
 #сериалайзер для Корзины
 
 
@@ -75,9 +75,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('amount_of_products', 'total_number_of_products')
-        # 'total_price_without_discount',
-        # 'total_price_with_discount', 'final_total_price'
+        fields = ('amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
+                  'total_price_with_discount', 'final_total_price')
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -137,7 +136,7 @@ class HitSaleProductsSerializer(serializers.ModelSerializer):
     colors = ColorSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
                   'favorite', 'images', 'colors')
 
@@ -147,7 +146,7 @@ class LatestProductsSerializer(serializers.ModelSerializer):
     colors = ColorSerializer(many=True)
 
     class Meta:
-        model = Product
+        model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
                   'favorite', 'images', 'colors')
 

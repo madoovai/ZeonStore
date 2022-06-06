@@ -31,7 +31,7 @@ class Color(models.Model):
         verbose_name_plural = "Цвета"
 
 
-class Product(models.Model):
+class ProductLine(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
     colors = models.ManyToManyField(Color, verbose_name="Цвета")
@@ -52,20 +52,12 @@ class Product(models.Model):
         return self.title
 
     def similar_products(self):
-        similar_products = Product.objects.filter(collection=self.collection).exclude(id=self.id)
+        similar_products = ProductLine.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
-
-    def hit_sale_products(self):
-        hit_sale_products = Product.objects.filter(hit=True)
-        return hit_sale_products
-
-    def latest_products(self):
-        latest_products = Product.objects.filter(latest=True)
-        return latest_products
 
     def save(self, *args, **kwargs):
         self.discount = 100 - (self.discount_price * 100 / self.old_price)
-        super(Product, self).save(*args, **kwargs)
+        super(ProductLine, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Товар"
@@ -73,7 +65,7 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductLine, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
     image = models.ImageField(verbose_name="Картинка")
     color = models.ForeignKey(Color, related_name="images", verbose_name="Цвет", on_delete=models.CASCADE, null=True)
 
@@ -85,69 +77,119 @@ class ProductImage(models.Model):
         verbose_name_plural = "Картинки"
 
 
-class Bag(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    amount_of_product = models.IntegerField(verbose_name="Количество линеек")
+class OrderItem(models.Model):
+    title = models.CharField(verbose_name="Название", max_length=200)
     color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
     old_price = models.IntegerField(verbose_name="Старая цена", null=True)
     discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
-    title = models.CharField(verbose_name="Название", max_length=50, null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
+    amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
 
     def __str__(self):
-        return self.product.title
-
-    def save(self, *args, **kwargs):
-        '''
-        метод для стягивания полей(цены, название, резмер, фото) с продукта,
-        который пришел в запросе и сохранение объекта в модели Корзина
-        '''
-        product = self.product
-        image = ProductImage.objects.get(product=self.product, color=self.color)
-        self.old_price = product.old_price
-        self.discount_price = product.discount_price
-        self.title = product.title
-        self.size_line = product.size_line
-        self.image = image
-        super(Bag, self).save(*args, **kwargs)
-
-    def total_number_of_products(self):
-        '''
-        Расчет общего колво товаров исходя из колво линеек в Корзине
-        :return: total_number_of_products
-        '''
-        product = self.product
-        self.amount_of_product = Bag.objects.get(product=product)
-        total_number_of_products = product.product_amount * self.amount_of_product
-        return total_number_of_products
+        return self.title
 
     class Meta:
-        verbose_name = "Корзина"
-        verbose_name_plural = "Корзина"
+        verbose_name = "Объект заказа"
+        verbose_name_plural = "Объекты заказа"
 
 
 class Order(models.Model):
-    amount_of_products = models.IntegerField(verbose_name="Количество линеек")
+    amount_of_productlines = models.IntegerField(verbose_name="Количество линеек")
     total_number_of_products = models.IntegerField(verbose_name="Количество товаров")
     total_price_without_discount = models.IntegerField(verbose_name="Общая цена без скидки")
     total_price_with_discount = models.IntegerField(verbose_name="Общая цена со скидкой")
     final_total_price = models.IntegerField(verbose_name="Итого цена")
 
-    def __str__(self):
+    def __int__(self):
         return self.id
 
     def save(self, *args, **kwargs):
-        '''
+        """
         Метод для оформления заказа, стягивание и суммирование данных с Корзины
-        '''
-        self.amount_of_products = Bag.objects.aggregate(Sum('amount_of_product')).get('amount_of_product__sum')
-        self.total_number_of_products = Bag.objects.aggregate(Sum(Bag.total_number_of_products(self.total_number_of_products)))
+        """
+        self.amount_of_productlines = ShoppingCart.objects.filter(order=self.id).aggregate(Sum('amount_of_productline')).get('amount_of_productline__sum')
+        self.total_number_of_products = ShoppingCart.total_number_of_products_in_shoppingcart()
+        self.total_price_without_discount = ShoppingCart.all_products_total_old_price()
+        self.total_price_with_discount = ShoppingCart.all_products_total_discount_price()
+        self.final_total_price = self.total_price_with_discount - self.total_price_without_discount
         super(Order, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
+
+
+class ShoppingCart(models.Model):
+    product = models.ForeignKey(ProductLine, on_delete=models.CASCADE)
+    amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
+    color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
+    total_old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    total_discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    title = models.CharField(verbose_name="Название", max_length=50, null=True)
+    size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
+    image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
+    total_amount_of_productline = models.IntegerField(verbose_name="Общее количество товаров", null=True)
+
+    def __str__(self):
+        return self.product.title
+
+    def save(self, *args, **kwargs):
+        """
+        1. метод для стягивания полей(цены, название, резмер, фото) с продукта,
+        который пришел в запросе и сохранение объекта в модели Корзина
+        2. Создание этого же объекта в модели OrderItem
+        """
+        product = self.product
+        image = ProductImage.objects.get(product=self.product, color=self.color)
+        self.total_old_price = product.old_price * self.amount_of_productline
+        self.total_discount_price = product.discount_price * self.amount_of_productline
+        self.title = product.title
+        self.size_line = product.size_line
+        self.image = image
+        self.total_amount_of_productline = product.product_amount * self.amount_of_productline
+        OrderItem.objects.create(title=self.title, color=self.color, image=self.image, old_price=self.total_old_price,
+                                 discount_price=self.total_discount_price, size_line=self.size_line,
+                                 amount_of_productline=self.amount_of_productline)
+        super(ShoppingCart, self).save(*args, **kwargs)
+
+    @staticmethod
+    def total_number_of_products_in_shoppingcart():
+        """
+        Расчет общего колво товаров исходя из колво линеек в Корзине
+        :return: total_number_of_products
+        """
+        total_number_of_products = 0
+        for product in ShoppingCart.objects.all():
+            total_number_of_products += product.total_amount_of_productline
+            return total_number_of_products
+
+    @staticmethod
+    def all_products_total_old_price():
+        """
+        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
+        :return: total_old_price
+        """
+        total_old_price = 0
+        for product in ShoppingCart.objects.all():
+            total_old_price += product.total_old_price
+            return total_old_price
+
+    @staticmethod
+    def all_products_total_discount_price():
+        """
+        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
+        :return: total_old_price
+        """
+        total_discount_price = 0
+        for product in ShoppingCart.objects.all():
+            total_discount_price += product.total_discount_price
+            return total_discount_price
+
+    class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзина"
 
 
 class User(models.Model):
@@ -271,7 +313,39 @@ class Help(models.Model):
         verbose_name_plural = "Помощь"
 
 
+class Footer(models.Model):
+    logotype = models.ImageField(verbose_name="Логотип")
+    text_info = models.CharField(verbose_name="Текстовая информация", max_length=500)
+    phone_number = models.IntegerField(verbose_name="Номер")
+
+    def __str__(self):
+        return self.text_info
+
+    class Meta:
+        verbose_name = "Футер"
+        verbose_name_plural = "Футер"
 
 
+class SecondFooter(models.Model):
+    TYPE = (
+        ("number", _("Телефон")),
+        ("email", _("Почта")),
+        ("Instagram", _("Инстаграм")),
+        ("Telegram", _("Телеграм")),
+        ("WhatsApp", _("WhatsApp"))
+    )
+    link = models.ForeignKey(Footer, on_delete=models.CASCADE)
+    type = models.CharField(verbose_name="Тип", choices=TYPE, max_length=50)
+    input_field = models.CharField(verbose_name="Поле для заполнения", max_length=500)
 
+    def __str__(self):
+        return self.type
 
+    def save(self, *args, **kwargs):
+        if self.type is 'WhatsApp':
+            self.input_field = 'https://wa.me/' + self.input_field
+        super(SecondFooter, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Вторая вкладка"
+        verbose_name_plural = "Вторая вкладка"
