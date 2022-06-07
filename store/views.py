@@ -4,8 +4,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from store.models import ProductLine, Collection, About, News, PublicOffer, Help, ImageHelp, ShoppingCart, Slider, OurAdvantage, \
-    Order
+from store.models import ProductLine, Collection, About, News, PublicOffer, Help, ImageHelp, ShoppingCart, Slider, \
+    OurAdvantage, \
+    Order, OrderItem
 from store.pagination import TwelvePagination, EightPagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
@@ -14,37 +15,46 @@ from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSe
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-
     serializer_class = ProductSerializer
     queryset = ProductLine.objects.all()
 
 
-class BagProductViewSet(viewsets.ModelViewSet):
-
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    # viewset для Корзины
     serializer_class = ShoppingCartSerializer
     queryset = ShoppingCart.objects.all()
-#viewset для Корзины
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
 
+    def perform_create(self, serializer):
+        order = serializer.save()
+
+        for item in ShoppingCart.objects.all():
+            OrderItem.objects.create(title=item.title, color=item.color, image=item.image,
+                                     total_old_price=item.total_old_price, order=order,
+                                     total_discount_price=item.total_discount_price, size_line=item.size_line,
+                                     amount_of_productline=item.amount_of_productline, product=item.product)
+        order.calculate_order_data()
+
+        ShoppingCart.objects.all().delete()
+
 
 def random_products():
+    # метод для 5 рандомных товаров
     products = ProductLine.objects.all()
     random_products = random.sample(list(products), 5)
     return random_products
-#метод для 5 рандомных товаров
 
 
 class FavoriteProductViewSet(viewsets.ModelViewSet):
-    '''
+    """
     отображение Избранных товаров в API с проверкой если товаров в Избранном нет,
     то вызывается метод для рандомных товаров (метод находится выше)
     + пагинация 12
-    '''
+    """
     queryset = ProductLine.objects.filter(favorite=True)
     serializer_class = FavoriteProductSerializer
     pagination_class = TwelvePagination
