@@ -26,6 +26,11 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    """
+    - Клонирование объектов Корзины в OrderItem при создании объекта Заказа
+    - order.calculate_order_data() - Общий расчет цен, колво линеек и продуктов Заказа
+    - ShoppingCart.objects.all().delete() - Опустошение корзины
+    """
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
 
@@ -43,7 +48,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 def random_products():
-    # метод для 5 рандомных товаров
+    """
+    метод для 5 рандомных товаров
+    """
     products = ProductLine.objects.all()
     random_products = random.sample(list(products), 5)
     return random_products
@@ -75,19 +82,23 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='products')
     def get_products_of_collection(self, request, pk):
+        """
+        декоратор для отображения отфильтрованных по коллекции продуктов в API + пагинация
+        """
         products = ProductLine.objects.filter(collection=pk)
         paginator = TwelvePagination()
         page = paginator.paginate_queryset(products, request)
         serializer = CollectionProductSerializer(page, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
-    #декоратор для отображения отфильтрованных по коллекции продуктов в API + пагинация
 
     @action(detail=True, methods=['get'], url_path='latest-products')
     def get_latest_products_of_collection(self, request, pk):
+        """
+        декоратор для отображения отфильтрованных по коллекции продуктов со статусом "Новинка" в API + пагинация
+        """
         latest_products = ProductLine.objects.filter(collection=pk, latest=True)
         serializer = CollectionProductSerializer(latest_products, many=True)
         return Response(serializer.data)
-    #декоратор для отображения отфильтрованных по коллекции и статусу "Новинка" продуктов в API
 
 
 class AboutUsViewSet(viewsets.ModelViewSet):
