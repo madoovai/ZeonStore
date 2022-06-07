@@ -67,16 +67,27 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = ('id', 'product', 'amount_of_productline', 'color', 'title',
-                  'size_line', 'total_old_price', 'total_discount_price', 'image', 'order')
+                  'size_line', 'total_old_price', 'total_discount_price', 'image')
+#сериалайзер для Корзины
+
+
+class OrderItemsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('product', 'amount_of_productline', 'color', 'title',
+                  'size_line', 'total_old_price', 'total_discount_price', 'image')
 #сериалайзер для Корзины
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemsSerializer(many=True)
 
     class Meta:
         model = Order
-        fields = ('amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
-                  'total_price_with_discount', 'final_total_price')
+        fields = ('name', 'last_name', 'email', 'phone_number', 'country', 'city', 'order_date', 'order_status',
+                  'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
+                  'total_price_with_discount', 'final_total_price', 'order_items')
 
 
 class CollectionSerializer(serializers.ModelSerializer):

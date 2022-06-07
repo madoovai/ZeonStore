@@ -1,6 +1,6 @@
 from django.contrib import admin
 from store.models import ProductLine, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, User, Footer, SecondFooter, OrderItem
+    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, Footer, SecondFooter, OrderItem
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -33,17 +33,13 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['title', 'color', 'old_price', 'discount_price',
+    list_display = ['title', 'order', 'color', 'total_old_price', 'total_discount_price',
                     'size_line', 'image', 'amount_of_productline']
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
+    list_display = ['name', 'order_date', 'order_status', 'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
                     'total_price_with_discount', 'final_total_price']
-
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = ['name', 'last_name', 'email', 'phone_number', 'order_date', 'order_status']
 
 
 class AboutAdmin(admin.ModelAdmin):
@@ -95,7 +91,6 @@ admin.site.register(Color, ColorAdmin)
 admin.site.register(ShoppingCart, ShoppingCartAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
-admin.site.register(User, UserAdmin)
 admin.site.register(About, AboutAdmin)
 admin.site.register(OurAdvantage, OurAdvantageAdmin)
 admin.site.register(News, NewsAdmin)

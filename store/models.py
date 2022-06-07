@@ -1,7 +1,6 @@
 from colorfield.fields import ColorField
 from django.db import models
 from ckeditor.fields import RichTextField
-from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 
 from store.validators import validate_file_extension
@@ -77,14 +76,102 @@ class ProductImage(models.Model):
         verbose_name_plural = "Картинки"
 
 
+class Order(models.Model):
+    ORDER_STATUSES = (
+        ("new", _("Новый")),
+        ("order_done", _("Оформлен")),
+        ("cancelled", _("Отменен")),
+    )
+
+    name = models.CharField(verbose_name="Имя", max_length=50)
+    last_name = models.CharField(verbose_name="Фамилия", max_length=50)
+    email = models.CharField(verbose_name="Электронная почта", max_length=50)
+    phone_number = models.IntegerField(verbose_name="Номер телефона")
+    country = models.CharField(verbose_name="Страна", max_length=50)
+    city = models.CharField(verbose_name="Город", max_length=50)
+    order_date = models.DateField(verbose_name="Дата оформления", auto_now_add=True)
+    order_status = models.CharField(verbose_name="Статус заказа", max_length=50, choices=ORDER_STATUSES, default="new")
+
+    amount_of_productlines = models.IntegerField(verbose_name="Количество линеек", default=0)
+    total_number_of_products = models.IntegerField(verbose_name="Количество товаров", default=0)
+    total_price_without_discount = models.IntegerField(verbose_name="Общая цена без скидки", default=0)
+    total_price_with_discount = models.IntegerField(verbose_name="Общая цена со скидкой", default=0)
+    final_total_price = models.IntegerField(verbose_name="Итого цена", default=0)
+
+    def __str__(self):
+        return f"Заказ {self.id}"
+
+    def order_items(self):
+        order_items = OrderItem.objects.filter(order=self)
+        return order_items
+
+    def calculate_order_data(self):
+        """
+        Метод для оформления заказа, стягивание и суммирование данных с Корзины
+        """
+        self.amount_of_productlines = self.total_number_of_productlines_in_order()
+        self.total_number_of_products = self.total_number_of_products_in_order()
+        self.total_price_without_discount = self.total_old_price()
+        self.total_price_with_discount = self.total_discount_price()
+        self.final_total_price = self.total_price_without_discount - self.total_price_with_discount
+
+        self.save()
+
+    def total_number_of_productlines_in_order(self):
+        """
+        Расчет общего колво линеек исходя из колво линеек в Корзине
+        :return: total_number_of_productlines
+        """
+        total_number_of_productlines = 0
+        for product in OrderItem.objects.filter(order=self):
+            total_number_of_productlines += product.amount_of_productline
+        return total_number_of_productlines
+
+    def total_number_of_products_in_order(self):
+        """
+        Расчет общего колво товаров исходя из колво линеек в Корзине
+        :return: total_number_of_products
+        """
+        total_number_of_products = 0
+        for order_item in OrderItem.objects.filter(order=self):
+            total_number_of_products += order_item.amount_of_productline * order_item.product.product_amount
+        return total_number_of_products
+
+    def total_old_price(self):
+        """
+        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
+        :return: total_old_price
+        """
+        total_old_price = 0
+        for product in OrderItem.objects.filter(order=self):
+            total_old_price += product.total_old_price
+        return total_old_price
+
+    def total_discount_price(self):
+        """
+        Расчет общей цены со скидкой всех товаров исходя из колво линеек в Корзине
+        :return: total_discount_price
+        """
+        total_discount_price = 0
+        for product in OrderItem.objects.filter(order=self):
+            total_discount_price += product.total_discount_price
+        return total_discount_price
+
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
+
 class OrderItem(models.Model):
+    product = models.ForeignKey(ProductLine, verbose_name="Линейка", on_delete=models.CASCADE)
     title = models.CharField(verbose_name="Название", max_length=200)
     color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
-    old_price = models.IntegerField(verbose_name="Старая цена", null=True)
-    discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    total_old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    total_discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
     amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
+    order = models.ForeignKey(Order, verbose_name="Заказ", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -92,32 +179,6 @@ class OrderItem(models.Model):
     class Meta:
         verbose_name = "Объект заказа"
         verbose_name_plural = "Объекты заказа"
-
-
-class Order(models.Model):
-    amount_of_productlines = models.IntegerField(verbose_name="Количество линеек")
-    total_number_of_products = models.IntegerField(verbose_name="Количество товаров")
-    total_price_without_discount = models.IntegerField(verbose_name="Общая цена без скидки")
-    total_price_with_discount = models.IntegerField(verbose_name="Общая цена со скидкой")
-    final_total_price = models.IntegerField(verbose_name="Итого цена")
-
-    def __int__(self):
-        return self.id
-
-    def save(self, *args, **kwargs):
-        """
-        Метод для оформления заказа, стягивание и суммирование данных с Корзины
-        """
-        self.amount_of_productlines = ShoppingCart.objects.filter(order=self.id).aggregate(Sum('amount_of_productline')).get('amount_of_productline__sum')
-        self.total_number_of_products = ShoppingCart.total_number_of_products_in_shoppingcart()
-        self.total_price_without_discount = ShoppingCart.all_products_total_old_price()
-        self.total_price_with_discount = ShoppingCart.all_products_total_discount_price()
-        self.final_total_price = self.total_price_with_discount - self.total_price_without_discount
-        super(Order, self).save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
 
 
 class ShoppingCart(models.Model):
@@ -129,7 +190,6 @@ class ShoppingCart(models.Model):
     title = models.CharField(verbose_name="Название", max_length=50, null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
     total_amount_of_productline = models.IntegerField(verbose_name="Общее количество товаров", null=True)
 
     def __str__(self):
@@ -149,71 +209,11 @@ class ShoppingCart(models.Model):
         self.size_line = product.size_line
         self.image = image
         self.total_amount_of_productline = product.product_amount * self.amount_of_productline
-        OrderItem.objects.create(title=self.title, color=self.color, image=self.image, old_price=self.total_old_price,
-                                 discount_price=self.total_discount_price, size_line=self.size_line,
-                                 amount_of_productline=self.amount_of_productline)
         super(ShoppingCart, self).save(*args, **kwargs)
-
-    @staticmethod
-    def total_number_of_products_in_shoppingcart():
-        """
-        Расчет общего колво товаров исходя из колво линеек в Корзине
-        :return: total_number_of_products
-        """
-        total_number_of_products = 0
-        for product in ShoppingCart.objects.all():
-            total_number_of_products += product.total_amount_of_productline
-            return total_number_of_products
-
-    @staticmethod
-    def all_products_total_old_price():
-        """
-        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
-        :return: total_old_price
-        """
-        total_old_price = 0
-        for product in ShoppingCart.objects.all():
-            total_old_price += product.total_old_price
-            return total_old_price
-
-    @staticmethod
-    def all_products_total_discount_price():
-        """
-        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
-        :return: total_old_price
-        """
-        total_discount_price = 0
-        for product in ShoppingCart.objects.all():
-            total_discount_price += product.total_discount_price
-            return total_discount_price
 
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
-
-
-class User(models.Model):
-    ORDER_STATUSES = (
-        ("new", _("Новый")),
-        ("order_done", _("Оформлен")),
-        ("cancelled", _("Отменен")),
-    )
-
-    name = models.CharField(verbose_name="Имя", max_length=50)
-    last_name = models.CharField(verbose_name="Фамилия", max_length=50)
-    email = models.CharField(verbose_name="Электронная почта", max_length=50)
-    phone_number = models.IntegerField(verbose_name="Номер телефона")
-    country = models.CharField(verbose_name="Страна", max_length=50)
-    city = models.CharField(verbose_name="Город", max_length=50)
-    order_date = models.DateField(verbose_name="Дата оформления")
-    order_status = models.CharField(verbose_name="Статус заказа", max_length=50, choices=ORDER_STATUSES, default="new")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
 
 
 class About(models.Model):
