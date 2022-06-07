@@ -72,15 +72,19 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
 
 class OrderItemsSerializer(serializers.ModelSerializer):
-
+    """
+    сериалайзер для Корзины
+    """
     class Meta:
         model = ShoppingCart
         fields = ('product', 'amount_of_productline', 'color', 'title',
                   'size_line', 'total_old_price', 'total_discount_price', 'image')
-#сериалайзер для Корзины
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    """
+    API заказа, вся информация о заказе(пользователь, инфо о заказе и продукты) на одной странице
+    """
     order_items = OrderItemsSerializer(many=True)
 
     class Meta:
