@@ -1,4 +1,5 @@
 from colorfield.fields import ColorField
+from django.core.exceptions import ValidationError
 from django.db import models
 from ckeditor.fields import RichTextField
 from django.utils.translation import gettext_lazy as _
@@ -77,6 +78,9 @@ class ProductImage(models.Model):
 
 
 class Order(models.Model):
+    """
+    Модель Заказ с полями пользователя и расчета цен и колво товаров в заказе
+    """
     ORDER_STATUSES = (
         ("new", _("Новый")),
         ("order_done", _("Оформлен")),
@@ -102,6 +106,9 @@ class Order(models.Model):
         return f"Заказ {self.id}"
 
     def order_items(self):
+        """
+        Фильтрация товаров по заказу для API
+        """
         order_items = OrderItem.objects.filter(order=self)
         return order_items
 
@@ -241,8 +248,8 @@ class AboutImage(models.Model):
 
 
 class OurAdvantage(models.Model):
+    """валидатор по формату загружаемоего файла, допустимо только .svg or .png"""
     icon = models.FileField(verbose_name="Иконка", validators=[validate_file_extension])
-    #валидатор по формату загружаемоего файла, допустимо только .svg or .png
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = models.CharField(max_length=200, verbose_name="Описание")
 
@@ -314,6 +321,9 @@ class Help(models.Model):
 
 
 class Footer(models.Model):
+    """
+    Футер первая вкладка
+    """
     logotype = models.ImageField(verbose_name="Логотип")
     text_info = models.CharField(verbose_name="Текстовая информация", max_length=500)
     phone_number = models.IntegerField(verbose_name="Номер")
@@ -321,31 +331,49 @@ class Footer(models.Model):
     def __str__(self):
         return self.text_info
 
+    def numbers_and_social_media(self):
+        """Метод для получения объектов со Второй Вкладки по ссылке
+        Это для API"""
+        numbers_and_social_media = SecondFooter.objects.filter(link=self)
+        return numbers_and_social_media
+
     class Meta:
         verbose_name = "Футер"
         verbose_name_plural = "Футер"
 
 
 class SecondFooter(models.Model):
+    """Футер второя вкладка"""
     TYPE = (
         ("number", _("Телефон")),
         ("email", _("Почта")),
-        ("Instagram", _("Инстаграм")),
-        ("Telegram", _("Телеграм")),
-        ("WhatsApp", _("WhatsApp"))
+        ("instagram", _("Инстаграм")),
+        ("telegram", _("Телеграм")),
+        ("whatsapp", _("WhatsApp"))
     )
     link = models.ForeignKey(Footer, on_delete=models.CASCADE)
     type = models.CharField(verbose_name="Тип", choices=TYPE, max_length=50)
     input_field = models.CharField(verbose_name="Поле для заполнения", max_length=500)
 
+    def save(self, *args, **kwargs):
+        """Метод для проверки поля "whatsapp" и конвертация этого поля в ссылку"""
+        if self.type == "whatsapp" and self.input_field.startswith('0') and len(self.input_field) == 10:
+            self.input_field = self.input_field[1:]
+            self.input_field = f"https://wa.me/996{self.input_field}"
+
+        if self.type == "whatsapp" and len(self.input_field) == 9:
+            self.input_field = f"https://wa.me/996{self.input_field}"
+
+        if self.type == "whatsapp" and len(self.input_field) <= 9:
+            return ValidationError("Need more that 9 numbers")
+
+        super(SecondFooter, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.type
-
-    def save(self, *args, **kwargs):
-        if self.type is 'WhatsApp':
-            self.input_field = 'https://wa.me/' + self.input_field
-        super(SecondFooter, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Вторая вкладка"
         verbose_name_plural = "Вторая вкладка"
+
+

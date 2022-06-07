@@ -6,12 +6,12 @@ from rest_framework.response import Response
 
 from store.models import ProductLine, Collection, About, News, PublicOffer, Help, ImageHelp, ShoppingCart, Slider, \
     OurAdvantage, \
-    Order, OrderItem
+    Order, OrderItem, Footer
 from store.pagination import TwelvePagination, EightPagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
     FavoriteProductSerializer, SliderSerializer, HitSaleProductsSerializer, \
-    LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer, ShoppingCartSerializer
+    LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer, ShoppingCartSerializer, FooterSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -72,7 +72,6 @@ class FavoriteProductViewSet(viewsets.ModelViewSet):
             return random_products()
         else:
             return queryset
-
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -155,6 +154,12 @@ class OurAdvantagesViewSet(viewsets.ModelViewSet):
 
     serializer_class = OurAdvantagesSerializer
     queryset = OurAdvantage.objects.all()
+
+
+class FooterViewSet(viewsets.ModelViewSet):
+
+    serializer_class = FooterSerializer
+    queryset = Footer.objects.all()
 
 
 

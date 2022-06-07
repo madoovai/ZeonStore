@@ -77,7 +77,7 @@ class ImageHelpAdmin(admin.ModelAdmin):
 class SecondFooterAdminInline(admin.TabularInline):
     model = SecondFooter
     extra = 0
-    readonly_fields = ['link']
+    list_display = ['input_field']
 
 
 class FooterAdmin(admin.ModelAdmin):
