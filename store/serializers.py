@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import ProductLine, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, ShoppingCart, Slider, Order, OurAdvantage
+    Help, ShoppingCart, Slider, Order, OurAdvantage, Footer, SecondFooter
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -171,5 +171,21 @@ class OurAdvantagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = OurAdvantage
         fields = ('icon', 'headline', 'description')
+
+
+class SecondFooterSerializer(serializers.ModelSerializer):
+    """Сериализатор для Второй вкладки Футера"""
+    class Meta:
+        model = SecondFooter
+        fields = ('type', 'input_field')
+
+
+class FooterSerializer(serializers.ModelSerializer):
+    """Сериализатор для первой вкладки Футера"""
+    numbers_and_social_media = SecondFooterSerializer(many=True)
+    class Meta:
+        model = Footer
+        fields = ('phone_number', 'logotype', 'text_info', 'numbers_and_social_media')
+
 
 

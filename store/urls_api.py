@@ -2,7 +2,7 @@ from rest_framework.routers import DefaultRouter
 
 from store.views import ProductViewSet, CollectionViewSet, AboutUsViewSet, NewsViewSet, \
     PublicOfferViewSet, HelpViewSet, FavoriteProductViewSet, ShoppingCartViewSet, OrderViewSet, SliderViewSet, \
-    HitSaleProductsViewSet, LatestProductsViewSet, OurAdvantagesViewSet
+    HitSaleProductsViewSet, LatestProductsViewSet, OurAdvantagesViewSet, FooterViewSet
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='products_api')
@@ -18,5 +18,6 @@ router.register(r'slider', SliderViewSet, basename='slider_api')
 router.register(r'hitsale-product', HitSaleProductsViewSet, basename='hitsale_product_api')
 router.register(r'latest-product', LatestProductsViewSet, basename='latest_product_api')
 router.register(r'our-advantages', OurAdvantagesViewSet, basename='our_advantages_api')
+router.register(r'footer', FooterViewSet, basename='footer_api')
 
 urlpatterns = router.urls
