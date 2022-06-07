@@ -6,12 +6,13 @@ from rest_framework.response import Response
 
 from store.models import ProductLine, Collection, About, News, PublicOffer, Help, ImageHelp, ShoppingCart, Slider, \
     OurAdvantage, \
-    Order, OrderItem, Footer
+    Order, OrderItem, Footer, CallBack
 from store.pagination import TwelvePagination, EightPagination
 from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSerializer, \
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
     FavoriteProductSerializer, SliderSerializer, HitSaleProductsSerializer, \
-    LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer, ShoppingCartSerializer, FooterSerializer
+    LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer, ShoppingCartSerializer, FooterSerializer, \
+    CallBackSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -160,6 +161,12 @@ class FooterViewSet(viewsets.ModelViewSet):
 
     serializer_class = FooterSerializer
     queryset = Footer.objects.all()
+
+
+class CallBackViewSet(viewsets.ModelViewSet):
+
+    serializer_class = CallBackSerializer
+    queryset = CallBack.objects.all()
 
 
 
