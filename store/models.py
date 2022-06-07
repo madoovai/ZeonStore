@@ -377,3 +377,19 @@ class SecondFooter(models.Model):
         verbose_name_plural = "Вторая вкладка"
 
 
+class CallBack(models.Model):
+    """Моделька Обратного звонка"""
+    name = models.CharField(verbose_name="Имя", max_length=200)
+    phone_number = models.CharField(verbose_name="Номер телефона", max_length=100)
+    call_received_date = models.DateField(verbose_name="Дата обращения", auto_now_add=True)
+    callback_type = models.CharField(verbose_name="Тип обращения", default="Обратный звонок", max_length=200)
+    called_back = models.BooleanField(verbose_name="Статус позвонили?", default=False)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Обратный звонок"
+        verbose_name_plural = "Обратный звонок"
+
+

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from store.models import ProductLine, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, Footer, SecondFooter, OrderItem
+    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, Footer, SecondFooter, OrderItem, CallBack
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -85,6 +85,10 @@ class FooterAdmin(admin.ModelAdmin):
     list_display = ['text_info', 'phone_number']
 
 
+class CallBackAdmin(admin.ModelAdmin):
+    list_display = ['name', 'phone_number', 'call_received_date', 'callback_type', 'called_back']
+
+
 admin.site.register(ProductLine, ProductLineAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Color, ColorAdmin)
@@ -99,5 +103,6 @@ admin.site.register(PublicOffer, PublicOfferAdmin)
 admin.site.register(Help, HelpAdmin)
 admin.site.register(ImageHelp, ImageHelpAdmin)
 admin.site.register(Footer, FooterAdmin)
+admin.site.register(CallBack, CallBackAdmin)
 
 
