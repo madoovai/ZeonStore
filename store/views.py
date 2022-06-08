@@ -1,6 +1,6 @@
 import random
 
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -12,7 +12,7 @@ from store.serializers import ProductSerializer, CollectionSerializer, AboutUsSe
     NewsSerializer, PublicOfferSerializer, HelpSerializer, HelpImageSerializer, CollectionProductSerializer, \
     FavoriteProductSerializer, SliderSerializer, HitSaleProductsSerializer, \
     LatestProductsSerializer, OurAdvantagesSerializer, OrderSerializer, ShoppingCartSerializer, FooterSerializer, \
-    CallBackSerializer
+    CallBackSerializer, SearchProductSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -102,25 +102,21 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
 
 class AboutUsViewSet(viewsets.ModelViewSet):
-
     serializer_class = AboutUsSerializer
     queryset = About.objects.all()
 
 
 class NewsViewSet(viewsets.ModelViewSet):
-
     serializer_class = NewsSerializer
     queryset = News.objects.all()
 
 
 class PublicOfferViewSet(viewsets.ModelViewSet):
-
     serializer_class = PublicOfferSerializer
     queryset = PublicOffer.objects.all()
 
 
 class HelpViewSet(viewsets.ModelViewSet):
-
     serializer_class = HelpSerializer
     queryset = Help.objects.all()
 
@@ -134,7 +130,6 @@ class HelpViewSet(viewsets.ModelViewSet):
 
 
 class SliderViewSet(viewsets.ModelViewSet):
-
     serializer_class = SliderSerializer
     queryset = Slider.objects.all()
 
@@ -152,21 +147,39 @@ class LatestProductsViewSet(viewsets.ModelViewSet):
 
 
 class OurAdvantagesViewSet(viewsets.ModelViewSet):
-
     serializer_class = OurAdvantagesSerializer
     queryset = OurAdvantage.objects.all()
 
 
 class FooterViewSet(viewsets.ModelViewSet):
-
     serializer_class = FooterSerializer
     queryset = Footer.objects.all()
 
 
 class CallBackViewSet(viewsets.ModelViewSet):
-
     serializer_class = CallBackSerializer
     queryset = CallBack.objects.all()
+
+
+class SearchProductViewSet(generics.ListAPIView):
+    """Поиск товара по названию + пагинация 8"""
+    queryset = ProductLine.objects.all()
+    serializer_class = SearchProductSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title',]
+    pagination_class = EightPagination
+
+    def get_queryset(self):
+        """метод для проверки наличия результата поиска,
+        если нет то вызов функции рандомных товаров"""
+        keyword = self.request.query_params.get('title', '')
+        queryset = ProductLine.objects.filter(title__icontains=keyword)
+        if len(queryset) == 0:
+            return random_products()
+        else:
+            return queryset
+
+
 
 
 
