@@ -195,4 +195,15 @@ class CallBackSerializer(serializers.ModelSerializer):
         fields = ('name', 'phone_number', 'callback_type')
 
 
+class SearchProductSerializer(serializers.ModelSerializer):
+    """Сериализатор для поиска товаров"""
+    images = ImageSerializer(many=True)
+    colors = ColorSerializer(many=True)
+
+    class Meta:
+        model = ProductLine
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
+                  'favorite', 'colors', 'images',)
+
+
 

@@ -17,11 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_swagger.views import get_swagger_view
 
+from store.views import SearchProductViewSet
+
 schema_view = get_swagger_view(title='API for Store')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('store.urls_api')),
-    path('swagger/', schema_view)
+    path('swagger/', schema_view),
+    path('search/', SearchProductViewSet.as_view(), name='search')
 ]
 

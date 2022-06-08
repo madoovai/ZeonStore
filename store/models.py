@@ -391,5 +391,3 @@ class CallBack(models.Model):
     class Meta:
         verbose_name = "Обратный звонок"
         verbose_name_plural = "Обратный звонок"
-
-

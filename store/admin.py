@@ -87,6 +87,8 @@ class FooterAdmin(admin.ModelAdmin):
 
 class CallBackAdmin(admin.ModelAdmin):
     list_display = ['name', 'phone_number', 'call_received_date', 'callback_type', 'called_back']
+    search_fields = ['name', 'phone_number']
+    list_filter = ['called_back']
 
 
 admin.site.register(ProductLine, ProductLineAdmin)
