@@ -7,7 +7,7 @@ from store.views import ProductViewSet, CollectionViewSet, AboutUsViewSet, NewsV
 router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='products_api')
 router.register(r'favorite-products', FavoriteProductViewSet, basename='favorite_products_api')
-router.register(r'bag', ShoppingCartViewSet, basename='bag_api')
+router.register(r'shopping-cart', ShoppingCartViewSet, basename='shopping_cart_api')
 router.register(r'order', OrderViewSet, basename='order_api')
 router.register(r'collections', CollectionViewSet, basename='collections_api')
 router.register(r'about-us', AboutUsViewSet, basename='about_us_api')

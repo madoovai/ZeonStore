@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from store.models import ProductLine, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, ShoppingCart, Slider, Order, OurAdvantage, Footer, SecondFooter, CallBack
+    Help, ShoppingCart, Slider, Order, OurAdvantage, Footer, SecondFooter, CallBack, OrderItem
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -63,20 +63,19 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
-
+    """сериалайзер для Корзины"""
     class Meta:
         model = ShoppingCart
         fields = ('id', 'product', 'amount_of_productline', 'color', 'title',
                   'size_line', 'total_old_price', 'total_discount_price', 'image')
-#сериалайзер для Корзины
 
 
 class OrderItemsSerializer(serializers.ModelSerializer):
     """
-    сериалайзер для Корзины
+    сериалайзер для Товаров оформленного заказа
     """
     class Meta:
-        model = ShoppingCart
+        model = OrderItem
         fields = ('product', 'amount_of_productline', 'color', 'title',
                   'size_line', 'total_old_price', 'total_discount_price', 'image')
 
@@ -91,7 +90,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ('name', 'last_name', 'email', 'phone_number', 'country', 'city', 'order_date', 'order_status',
                   'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
-                  'total_price_with_discount', 'final_total_price', 'order_items')
+                  'total_discount', 'final_total_price', 'order_items')
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -203,7 +202,7 @@ class SearchProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'colors', 'images',)
+                  'favorite', 'colors', 'images')
 
 
 
