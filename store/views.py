@@ -25,6 +25,56 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     serializer_class = ShoppingCartSerializer
     queryset = ShoppingCart.objects.all()
 
+    def get_total_number_of_productlines_in_shoppingcart(self):
+        """
+        Расчет общего колво линеек исходя из колво линеек в Корзине
+        :return: total_number_of_productlines
+        """
+        total_number_of_productlines = 0
+        for product in ShoppingCart.objects.all():
+            total_number_of_productlines += product.amount_of_productline
+        return total_number_of_productlines
+
+    def get_total_number_of_products_in_shoppingcart(self):
+        """
+        Расчет общего колво товаров исходя из колво линеек в Корзине
+        :return: total_number_of_products
+        """
+        total_number_of_products = 0
+        for order_item in ShoppingCart.objects.all():
+            total_number_of_products += order_item.amount_of_productline * order_item.product.product_amount
+        return total_number_of_products
+
+    def get_total_old_price(self):
+        """
+        Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
+        :return: total_old_price
+        """
+        total_old_price = 0
+        for product in ShoppingCart.objects.all():
+            total_old_price += product.total_old_price
+        return total_old_price
+
+    def get_total_discount(self):
+        """
+        Расчет общей цены со скидкой всех товаров исходя из колво линеек в Корзине
+        :return: total_discount_price
+        """
+        total_discount = 0
+        for product in ShoppingCart.objects.all():
+            total_discount += (product.total_old_price - product.total_discount_price)
+        return total_discount
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        response.data["total_number_of_productlines"] = self.get_total_number_of_productlines_in_shoppingcart()
+        response.data["total_number_of_products"] = self.get_total_number_of_products_in_shoppingcart()
+        response.data["total_old_price"] = self.get_total_old_price()
+        response.data["total_discount"] = self.get_total_discount()
+        response.data["total_final_price"] = self.get_total_old_price() - self.get_total_discount()
+        return response
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
@@ -174,13 +224,18 @@ class SearchProductViewSet(generics.ListAPIView):
         если нет то вызов функции рандомных товаров"""
         keyword = self.request.query_params.get('title', '')
         queryset = ProductLine.objects.filter(title__icontains=keyword)
+
         if len(queryset) == 0:
             return random_products()
         else:
             return queryset
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        search_word = self.request.GET.get('title')
 
-
+        response.data["search_keyword"] = search_word
+        return response
 
 
 

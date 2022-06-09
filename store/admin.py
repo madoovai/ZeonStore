@@ -39,7 +39,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['name', 'order_date', 'order_status', 'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
-                    'total_price_with_discount', 'final_total_price']
+                    'total_discount', 'final_total_price']
 
 
 class AboutAdmin(admin.ModelAdmin):

@@ -99,18 +99,11 @@ class Order(models.Model):
     amount_of_productlines = models.IntegerField(verbose_name="Количество линеек", default=0)
     total_number_of_products = models.IntegerField(verbose_name="Количество товаров", default=0)
     total_price_without_discount = models.IntegerField(verbose_name="Общая цена без скидки", default=0)
-    total_price_with_discount = models.IntegerField(verbose_name="Общая цена со скидкой", default=0)
+    total_discount = models.IntegerField(verbose_name="Общая скидка", default=0)
     final_total_price = models.IntegerField(verbose_name="Итого цена", default=0)
 
     def __str__(self):
         return f"Заказ {self.id}"
-
-    def order_items(self):
-        """
-        Фильтрация товаров по заказу для API
-        """
-        order_items = OrderItem.objects.filter(order=self)
-        return order_items
 
     def calculate_order_data(self):
         """
@@ -118,9 +111,9 @@ class Order(models.Model):
         """
         self.amount_of_productlines = self.total_number_of_productlines_in_order()
         self.total_number_of_products = self.total_number_of_products_in_order()
-        self.total_price_without_discount = self.total_old_price()
-        self.total_price_with_discount = self.total_discount_price()
-        self.final_total_price = self.total_price_without_discount - self.total_price_with_discount
+        self.total_price_without_discount = self.total_old_price_in_order()
+        self.total_discount = self.total_price_without_discount - self.total_discount_in_order()
+        self.final_total_price = self.total_price_without_discount - self.total_discount
 
         self.save()
 
@@ -144,7 +137,7 @@ class Order(models.Model):
             total_number_of_products += order_item.amount_of_productline * order_item.product.product_amount
         return total_number_of_products
 
-    def total_old_price(self):
+    def total_old_price_in_order(self):
         """
         Расчет общей старой цены всех товаров исходя из колво линеек в Корзине
         :return: total_old_price
@@ -154,7 +147,7 @@ class Order(models.Model):
             total_old_price += product.total_old_price
         return total_old_price
 
-    def total_discount_price(self):
+    def total_discount_in_order(self):
         """
         Расчет общей цены со скидкой всех товаров исходя из колво линеек в Корзине
         :return: total_discount_price
@@ -163,6 +156,13 @@ class Order(models.Model):
         for product in OrderItem.objects.filter(order=self):
             total_discount_price += product.total_discount_price
         return total_discount_price
+
+    def order_items(self):
+        """
+        Фильтрация товаров по заказу для API
+        """
+        order_items = OrderItem.objects.filter(order=self)
+        return order_items
 
     class Meta:
         verbose_name = "Заказ"
@@ -197,7 +197,6 @@ class ShoppingCart(models.Model):
     title = models.CharField(verbose_name="Название", max_length=50, null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
-    total_amount_of_productline = models.IntegerField(verbose_name="Общее количество товаров", null=True)
 
     def __str__(self):
         return self.product.title
