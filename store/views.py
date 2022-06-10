@@ -1,5 +1,3 @@
-import random
-
 from rest_framework import viewsets, generics, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -100,10 +98,18 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 def random_products():
     """
-    метод для 5 рандомных товаров
+    метод для 5 рандомных уникальных товаров c филтрацией по коллекции
     """
-    products = ProductLine.objects.all()
-    random_products = random.sample(list(products), 5)
+    random_products = []
+    random_collections = []
+    for i in range(5):
+        random_collection_id = Collection.objects.order_by('?').first()
+        while random_collection_id in random_collections:
+            random_collection_id = Collection.objects.order_by('?').first()
+        random_collections.append(random_collection_id)
+        filtered_products = ProductLine.objects.filter(collection=random_collection_id)
+        random_product = filtered_products.order_by('?').first()
+        random_products.append(random_product)
     return random_products
 
 
@@ -233,7 +239,6 @@ class SearchProductViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         search_word = self.request.GET.get('title')
-
         response.data["search_keyword"] = search_word
         return response
 
