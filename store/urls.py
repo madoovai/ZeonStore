@@ -13,18 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_swagger.views import get_swagger_view
 
-from store.views import SearchProductViewSet
+from store.urls_api import router
+from store.views import SearchProductViewSet, HomeView, FooterViewSet
 
 schema_view = get_swagger_view(title='API for Store')
 
 urlpatterns = [
+    path('api/', include(router.urls)),
+    path('api/footer', FooterViewSet.as_view({'get': 'list'})),
+    path('', HomeView.as_view()),
     path('admin/', admin.site.urls),
-    path('api/', include('store.urls_api')),
     path('swagger/', schema_view),
     path('search/', SearchProductViewSet.as_view(), name='search')
 ]
 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
