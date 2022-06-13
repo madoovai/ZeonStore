@@ -1,15 +1,18 @@
+from django.db.models import Sum
 from rest_framework import serializers
 from store.models import ProductLine, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
     Help, ShoppingCart, Slider, Order, OurAdvantage, Footer, SecondFooter, CallBack, OrderItem
 
 
 class ColorSerializer(serializers.ModelSerializer):
+    """сериализатор для Цветов Изображений"""
     class Meta:
         model = Color
         fields = ('name', 'rgb')
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    """сериализатор для Изображений Продукта"""
     color = ColorSerializer()
 
     class Meta:
@@ -18,6 +21,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class CollectionProductSerializer(serializers.ModelSerializer):
+    """сериализатор для Коллекция(Товары)"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
 
@@ -28,6 +32,7 @@ class CollectionProductSerializer(serializers.ModelSerializer):
 
 
 class SimilarProductSerializer(serializers.ModelSerializer):
+    """сериализатор для Похожих товары"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
 
@@ -38,6 +43,7 @@ class SimilarProductSerializer(serializers.ModelSerializer):
 
 
 class FavoriteProductSerializer(serializers.ModelSerializer):
+    """сериализатор для Избранных товаров"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
 
@@ -45,10 +51,10 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
         model = ProductLine
         fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
                   'favorite', 'images', 'colors')
-        #сериализатор для избранных товаров
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """сериализатор для Товаров + Похожие товары"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
     similar_products = SimilarProductSerializer(many=True)
@@ -67,7 +73,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = ('id', 'product', 'amount_of_productline', 'color', 'title',
-                  'size_line', 'total_old_price', 'total_discount_price', 'image')
+                  'size_line', 'old_price', 'discount_price', 'image')
 
 
 class OrderItemsSerializer(serializers.ModelSerializer):
@@ -77,75 +83,81 @@ class OrderItemsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ('product', 'amount_of_productline', 'color', 'title',
-                  'size_line', 'total_old_price', 'total_discount_price', 'image')
+                  'size_line', 'old_price', 'discount_price', 'image')
 
 
 class OrderSerializer(serializers.ModelSerializer):
     """
     API заказа, вся информация о заказе(пользователь, инфо о заказе и продукты) на одной странице
     """
-    order_items = OrderItemsSerializer(many=True)
+    order_items = OrderItemsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ('name', 'last_name', 'email', 'phone_number', 'country', 'city', 'order_date', 'order_status',
+        fields = ('id', 'name', 'last_name', 'email', 'phone_number', 'country', 'city', 'order_date', 'order_status',
                   'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
                   'total_discount', 'final_total_price', 'order_items')
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-
+    """сериализатор для Коллекции"""
     class Meta:
         model = Collection
         fields = ('id', 'title', 'image')
 
 
 class AboutImageSerializer(serializers.ModelSerializer):
+    """сериализатор для Изображений для О нас"""
     class Meta:
         model = AboutImage
         fields = ('image',)
 
 
 class AboutUsSerializer(serializers.ModelSerializer):
+    """сериализатор для О нас"""
     images = AboutImageSerializer(many=True)
-
     class Meta:
         model = About
         fields = ('headline', 'description', 'images')
 
 
 class NewsSerializer(serializers.ModelSerializer):
+    """сериализатор для Новости"""
     class Meta:
         model = News
         fields = ('headline', 'description', 'photo')
 
 
 class PublicOfferSerializer(serializers.ModelSerializer):
+    """сериализатор для Публичной офферты"""
     class Meta:
         model = PublicOffer
         fields = ('headline', 'description')
 
 
 class HelpImageSerializer(serializers.ModelSerializer):
+    """сериализатор для Изображения для Помощь"""
     class Meta:
         model = ImageHelp
         fields = ('__all__',)
 
 
 class HelpSerializer(serializers.ModelSerializer):
-
+    """сериализатор для Помощь"""
     class Meta:
         model = Help
         fields = ('id', 'question', 'answer')
 
 
 class SliderSerializer(serializers.ModelSerializer):
+    """сериализатор для Слайдер"""
     class Meta:
         model = Slider
         fields = ('photo', 'link')
 
 
 class HitSaleProductsSerializer(serializers.ModelSerializer):
+    """сериализатор для Хит продаж"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
 
@@ -156,6 +168,7 @@ class HitSaleProductsSerializer(serializers.ModelSerializer):
 
 
 class LatestProductsSerializer(serializers.ModelSerializer):
+    """сериализатор для Товаров со статусом Новинка"""
     images = ImageSerializer(many=True)
     colors = ColorSerializer(many=True)
 
@@ -166,7 +179,7 @@ class LatestProductsSerializer(serializers.ModelSerializer):
 
 
 class OurAdvantagesSerializer(serializers.ModelSerializer):
-
+    """сериализатор для Наши преимущества"""
     class Meta:
         model = OurAdvantage
         fields = ('icon', 'headline', 'description')
@@ -182,6 +195,7 @@ class SecondFooterSerializer(serializers.ModelSerializer):
 class FooterSerializer(serializers.ModelSerializer):
     """Сериализатор для первой вкладки Футера"""
     numbers_and_social_media = SecondFooterSerializer(many=True)
+
     class Meta:
         model = Footer
         fields = ('phone_number', 'logotype', 'text_info', 'numbers_and_social_media')

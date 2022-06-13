@@ -3,11 +3,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from ckeditor.fields import RichTextField
 from django.utils.translation import gettext_lazy as _
-
 from store.validators import validate_file_extension
 
 
 class Collection(models.Model):
+    """Админка Коллекций"""
     title = models.CharField(max_length=200, verbose_name="Коллекция")
     image = models.ImageField(blank=True, null=True, verbose_name="Картинка")
 
@@ -20,6 +20,7 @@ class Collection(models.Model):
 
 
 class Color(models.Model):
+    """Админка Цветов"""
     name = models.CharField(verbose_name="Название цвета", max_length=30)
     rgb = ColorField(verbose_name="Цвет RGB")
 
@@ -32,6 +33,7 @@ class Color(models.Model):
 
 
 class ProductLine(models.Model):
+    """Админка Товара"""
     title = models.CharField(max_length=255, verbose_name="Название товара")
     articul = models.CharField(max_length=255, verbose_name="Артикул")
     colors = models.ManyToManyField(Color, verbose_name="Цвета")
@@ -44,18 +46,20 @@ class ProductLine(models.Model):
     size_line = models.CharField(verbose_name="Размерный ряд", max_length=10, null=True)
     product_amount = models.IntegerField(verbose_name="Количество в линейке", null=True, blank=True)
     collection = models.ForeignKey(Collection, verbose_name="Коллекция", on_delete=models.CASCADE)
-    hit = models.BooleanField(verbose_name="Хит продаж", blank=True, null=True)
-    latest = models.BooleanField(verbose_name="Новинки", blank=True, null=True)
-    favorite = models.BooleanField(verbose_name="Избранное", blank=True, null=True)
+    hit = models.BooleanField(verbose_name="Хит продаж")
+    latest = models.BooleanField(verbose_name="Новинки")
+    favorite = models.BooleanField(verbose_name="Избранное")
 
     def __str__(self):
         return self.title
 
     def similar_products(self):
+        """метод для филтрации товаров по коллекции для Похожих товаров"""
         similar_products = ProductLine.objects.filter(collection=self.collection).exclude(id=self.id)
         return similar_products
 
     def save(self, *args, **kwargs):
+        """переопределение поля Скидка, авторасчет скидки исходя из старой и новой цены товара"""
         self.discount = 100 - (self.discount_price * 100 / self.old_price)
         super(ProductLine, self).save(*args, **kwargs)
 
@@ -65,6 +69,7 @@ class ProductLine(models.Model):
 
 
 class ProductImage(models.Model):
+    """Админка Изображений Товара"""
     product = models.ForeignKey(ProductLine, related_name='images', verbose_name="Товар", on_delete=models.CASCADE)
     image = models.ImageField(verbose_name="Картинка")
     color = models.ForeignKey(Color, related_name="images", verbose_name="Цвет", on_delete=models.CASCADE, null=True)
@@ -144,22 +149,22 @@ class Order(models.Model):
         """
         total_old_price = 0
         for product in OrderItem.objects.filter(order=self):
-            total_old_price += product.total_old_price
+            total_old_price += product.old_price * product.amount_of_productline
         return total_old_price
 
     def total_discount_in_order(self):
         """
-        Расчет общей цены со скидкой всех товаров исходя из колво линеек в Корзине
+        Расчет общей скидки всех товаров исходя из колво линеек в Корзине
         :return: total_discount_price
         """
         total_discount_price = 0
         for product in OrderItem.objects.filter(order=self):
-            total_discount_price += product.total_discount_price
+            total_discount_price += product.discount_price * product.amount_of_productline
         return total_discount_price
 
     def order_items(self):
         """
-        Фильтрация товаров по заказу для API
+        Фильтрация товаров по Заказу
         """
         order_items = OrderItem.objects.filter(order=self)
         return order_items
@@ -170,11 +175,12 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """Админка Объекты Заказа"""
     product = models.ForeignKey(ProductLine, verbose_name="Линейка", on_delete=models.CASCADE)
     title = models.CharField(verbose_name="Название", max_length=200)
     color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
-    total_old_price = models.IntegerField(verbose_name="Старая цена", null=True)
-    total_discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
     amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
@@ -189,11 +195,12 @@ class OrderItem(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Админка Корзины"""
     product = models.ForeignKey(ProductLine, on_delete=models.CASCADE)
     amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
     color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)
-    total_old_price = models.IntegerField(verbose_name="Старая цена", null=True)
-    total_discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
+    old_price = models.IntegerField(verbose_name="Старая цена", null=True)
+    discount_price = models.IntegerField(verbose_name="Цена со скидкой", null=True)
     title = models.CharField(verbose_name="Название", max_length=50, null=True)
     size_line = models.CharField(verbose_name="Размер", max_length=20, null=True)
     image = models.ForeignKey(ProductImage, verbose_name="Фото", on_delete=models.CASCADE, null=True)
@@ -203,18 +210,16 @@ class ShoppingCart(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        1. метод для стягивания полей(цены, название, резмер, фото) с продукта,
+        метод для стягивания полей(цены, название, резмер, фото) с продукта,
         который пришел в запросе и сохранение объекта в модели Корзина
-        2. Создание этого же объекта в модели OrderItem
         """
-        product = self.product
         image = ProductImage.objects.get(product=self.product, color=self.color)
-        self.total_old_price = product.old_price * self.amount_of_productline
-        self.total_discount_price = product.discount_price * self.amount_of_productline
+        self.image = image
+        product = self.product
+        self.old_price = product.old_price
+        self.discount_price = product.discount_price
         self.title = product.title
         self.size_line = product.size_line
-        self.image = image
-        self.total_amount_of_productline = product.product_amount * self.amount_of_productline
         super(ShoppingCart, self).save(*args, **kwargs)
 
     class Meta:
@@ -223,6 +228,7 @@ class ShoppingCart(models.Model):
 
 
 class About(models.Model):
+    """Админка О нас"""
     headline = models.CharField(verbose_name="Заголовок", max_length=50)
     description = RichTextField()
 
@@ -235,6 +241,7 @@ class About(models.Model):
 
 
 class AboutImage(models.Model):
+    """Админка Изображение для О нас"""
     page = models.ForeignKey(About, related_name="images", verbose_name="Страница", null=True, on_delete=models.CASCADE)
     image = models.ImageField(verbose_name="Фотография", null=True)
 
@@ -247,7 +254,10 @@ class AboutImage(models.Model):
 
 
 class OurAdvantage(models.Model):
-    """валидатор по формату загружаемоего файла, допустимо только .svg or .png"""
+    """
+    - Админка Наши преимущества
+    - валидатор по формату загружаемоего файла, допустимо только .svg or .png
+    """
     icon = models.FileField(verbose_name="Иконка", validators=[validate_file_extension])
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = models.CharField(max_length=200, verbose_name="Описание")
@@ -261,6 +271,7 @@ class OurAdvantage(models.Model):
 
 
 class News(models.Model):
+    """Админка Новости"""
     photo = models.ImageField(verbose_name="Фотография")
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = RichTextField()
@@ -274,6 +285,7 @@ class News(models.Model):
 
 
 class Slider(models.Model):
+    """Админка Слайдер"""
     photo = models.ImageField(verbose_name="Фотография")
     link = models.CharField(verbose_name="Ссылка", max_length=250, null=True, blank=True)
 
@@ -282,9 +294,11 @@ class Slider(models.Model):
 
     class Meta:
         verbose_name = "Слайдер"
+        verbose_name_plural = "Слайдер"
 
 
 class PublicOffer(models.Model):
+    """Админка Публичная Офферта"""
     headline = models.CharField(max_length=20, verbose_name="Заголовок")
     description = RichTextField()
 
@@ -293,10 +307,11 @@ class PublicOffer(models.Model):
 
     class Meta:
         verbose_name = "Публичная офферта"
-        verbose_name_plural = "Публичные офферты"
+        verbose_name_plural = "Публичная офферта"
 
 
 class ImageHelp(models.Model):
+    """Админка Изображеие для Помощь"""
     image = models.ImageField(verbose_name="Фотография")
 
     def __str__(self):
@@ -308,6 +323,7 @@ class ImageHelp(models.Model):
 
 
 class Help(models.Model):
+    """Админка Помощь"""
     question = models.CharField(max_length=200, verbose_name="Вопрос")
     answer = models.CharField(max_length=500, verbose_name="Ответ")
 
@@ -342,7 +358,7 @@ class Footer(models.Model):
 
 
 class SecondFooter(models.Model):
-    """Футер второя вкладка"""
+    """Футер вторая вкладка"""
     TYPE = (
         ("number", _("Телефон")),
         ("email", _("Почта")),
@@ -350,7 +366,7 @@ class SecondFooter(models.Model):
         ("telegram", _("Телеграм")),
         ("whatsapp", _("WhatsApp"))
     )
-    link = models.ForeignKey(Footer, on_delete=models.CASCADE)
+    link = models.ForeignKey(Footer, on_delete=models.CASCADE, null=True)
     type = models.CharField(verbose_name="Тип", choices=TYPE, max_length=50)
     input_field = models.CharField(verbose_name="Поле для заполнения", max_length=500)
 
