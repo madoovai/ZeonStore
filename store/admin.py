@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.shortcuts import redirect
 
 from store.models import ProductLine, Collection, ProductImage, AboutImage, About, OurAdvantage, News, \
-    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, Footer, SecondFooter, OrderItem, CallBack
+    PublicOffer, Help, ImageHelp, Color, Slider, ShoppingCart, Order, Footer, SecondFooter, OrderItem, CallBack, \
+    UserFavoriteProduct
 
 
 class ImageAdminInline(admin.TabularInline):
@@ -28,7 +29,7 @@ class ColorAdmin(admin.ModelAdmin):
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ['product', 'color', 'old_price', 'discount_price',
+    list_display = ['user', 'product', 'color', 'old_price', 'discount_price',
                     'size_line', 'image', 'amount_of_productline']
 
 
@@ -144,6 +145,10 @@ class CallBackAdmin(admin.ModelAdmin):
     list_filter = ['called_back']
 
 
+class UserFavoriteProductAdmin(admin.ModelAdmin):
+    list_display = ['user', 'productline_id']
+
+
 admin.site.register(ProductLine, ProductLineAdmin)
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Color, ColorAdmin)
@@ -159,3 +164,4 @@ admin.site.register(Help, HelpAdmin)
 admin.site.register(ImageHelp, ImageHelpAdmin)
 admin.site.register(Footer, FooterAdmin)
 admin.site.register(CallBack, CallBackAdmin)
+admin.site.register(UserFavoriteProduct, UserFavoriteProductAdmin)
