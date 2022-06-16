@@ -1,4 +1,5 @@
 from colorfield.fields import ColorField
+from django.contrib.auth.models import AbstractUser, User
 from django.core.exceptions import ValidationError
 from django.db import models
 from ckeditor.fields import RichTextField
@@ -66,6 +67,18 @@ class ProductLine(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+
+
+class UserFavoriteProduct(models.Model):
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    productline_id = models.ForeignKey(ProductLine, verbose_name="Избранный товар", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = "Избранный товар пользователя"
+        verbose_name_plural = "Избранные товары пользователя"
 
 
 class ProductImage(models.Model):
@@ -195,7 +208,8 @@ class OrderItem(models.Model):
 
 
 class ShoppingCart(models.Model):
-    """Админка Корзины"""
+    """Модель Корзины"""
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(ProductLine, on_delete=models.CASCADE)
     amount_of_productline = models.IntegerField(verbose_name="Количество линеек")
     color = models.ForeignKey(Color, verbose_name="Цвет", on_delete=models.CASCADE)

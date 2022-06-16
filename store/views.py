@@ -219,6 +219,9 @@ class SliderViewSet(viewsets.ModelViewSet):
     serializer_class = SliderSerializer
     queryset = Slider.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
 class HitSaleProductsViewSet(viewsets.ModelViewSet):
     """viewset для продуктов со статусом Хиты Продаж"""
@@ -252,18 +255,17 @@ class CallBackViewSet(viewsets.ModelViewSet):
     queryset = CallBack.objects.all()
 
 
-class SearchProductViewSet(generics.ListAPIView):
+class SearchProduct(generics.ListAPIView):
     """Поиск товара по названию + пагинация 8"""
     queryset = ProductLine.objects.all()
     serializer_class = SearchProductSerializer
-    filter_backends = [filters.SearchFilter]
     search_fields = ['title',]
     pagination_class = EightPagination
 
     def get_queryset(self):
         """метод для проверки наличия результата поиска,
         если нет то вызов функции рандомных товаров"""
-        keyword = self.request.query_params.get('title', '')
+        keyword = self.request.query_params.get('search', '')
         queryset = ProductLine.objects.filter(title__icontains=keyword)
 
         if len(queryset) == 0:
@@ -274,9 +276,6 @@ class SearchProductViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         """Метод для передачи в response Ключевого слова с поисковика"""
         response = super().list(request, *args, **kwargs)
-        search_word = self.request.GET.get('title')
+        search_word = self.request.GET.get('search')
         response.data["search_keyword"] = search_word
         return response
-
-
-
