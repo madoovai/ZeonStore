@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'colorfield',
     'rest_framework_swagger',
-    'drf_yasg'
+    'firebase_auth'
 ]
 
 MIDDLEWARE = [
@@ -130,6 +130,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 8,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        # 'firebase_auth.authentication.FirebaseAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 # Default primary key field type
