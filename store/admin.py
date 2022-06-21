@@ -39,7 +39,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['name', 'order_date', 'order_status', 'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
+    list_display = ['user', 'name', 'order_date', 'order_status', 'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
                     'total_discount', 'final_total_price']
 
 

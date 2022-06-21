@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
 from rest_framework_swagger.views import get_swagger_view
 from store.urls_api import router
 from store.views import HomeView, SearchProduct
+from django.urls import include
+from django.urls import path
+from auth.views import RegisterView
 
 schema_view = get_swagger_view(title='API for Store')
 
@@ -27,6 +29,8 @@ from store.views import ProductViewSet, CollectionViewSet, AboutUsViewSet, NewsV
     PublicOfferViewSet, HelpViewSet, FavoriteProductViewSet, ShoppingCartViewSet, OrderViewSet, SliderViewSet, \
     HitSaleProductsViewSet, LatestProductsViewSet, OurAdvantagesViewSet, FooterViewSet, CallBackViewSet
 
+
+# router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='products_api')
 router.register(r'favorite-products', FavoriteProductViewSet, basename='favorite_products_api')
 router.register(r'shopping-cart', ShoppingCartViewSet, basename='shopping_cart_api')
@@ -47,6 +51,8 @@ router.register(r'call-back', CallBackViewSet, basename='callback_api')
 urlpatterns = [
     path('', HomeView.as_view()),
     path('admin/', admin.site.urls),
+    path('auth/', include('auth.urls')),
+    path('register/', RegisterView.as_view(), name='auth_register'),
     path('swagger/', schema_view),
     path('search/', SearchProduct.as_view(), name='search'),
 ]
