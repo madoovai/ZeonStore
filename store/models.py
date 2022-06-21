@@ -104,7 +104,7 @@ class Order(models.Model):
         ("order_done", _("Оформлен")),
         ("cancelled", _("Отменен")),
     )
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(verbose_name="Имя", max_length=50)
     last_name = models.CharField(verbose_name="Фамилия", max_length=50)
     email = models.CharField(verbose_name="Электронная почта", max_length=50)

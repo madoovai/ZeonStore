@@ -1,7 +1,8 @@
-from django.db.models import Sum
 from rest_framework import serializers
-from store.models import ProductLine, Collection, About, News, PublicOffer, ProductImage, Color, AboutImage, ImageHelp, \
-    Help, ShoppingCart, Slider, Order, OurAdvantage, Footer, SecondFooter, CallBack, OrderItem
+from store.models import ProductLine, Collection, About, News, PublicOffer, \
+                         ProductImage, Color, AboutImage, ImageHelp, Help, \
+                         ShoppingCart, Slider, Order, OurAdvantage, Footer, \
+                         SecondFooter, CallBack, OrderItem
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -27,8 +28,8 @@ class CollectionProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'images', 'colors')
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount',
+                  'size_line', 'favorite', 'images', 'colors')
 
 
 class SimilarProductSerializer(serializers.ModelSerializer):
@@ -38,8 +39,8 @@ class SimilarProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line', 'collection',
-                  'favorite', 'colors', 'images')
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount',
+                  'size_line', 'collection', 'favorite', 'colors', 'images')
 
 
 class FavoriteProductSerializer(serializers.ModelSerializer):
@@ -49,8 +50,8 @@ class FavoriteProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'images', 'colors')
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount',
+                  'size_line', 'favorite', 'images', 'colors')
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -62,9 +63,10 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLine
         fields = (
-            'id', 'title', 'articul', 'discount_price', 'old_price', 'fabric_structure',
-            'fabric', 'discount', 'size_line', 'product_amount', 'collection', 'hit', 'latest', 'favorite', 'colors',
-            'images', 'similar_products'
+            'id', 'title', 'articul', 'discount_price', 'old_price',
+            'fabric_structure', 'fabric', 'discount', 'size_line',
+            'product_amount', 'collection', 'hit', 'latest', 'favorite',
+            'colors', 'images', 'similar_products'
         )
 
 
@@ -88,15 +90,18 @@ class OrderItemsSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     """
-    API заказа, вся информация о заказе(пользователь, инфо о заказе и продукты) на одной странице
+    API заказа, вся информация о заказе(пользователь, инфо о заказе и продукты)
+    на одной странице
     """
     order_items = OrderItemsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ('id', 'name', 'last_name', 'email', 'phone_number', 'country', 'city', 'order_date', 'order_status',
-                  'amount_of_productlines', 'total_number_of_products', 'total_price_without_discount',
-                  'total_discount', 'final_total_price', 'order_items')
+        fields = ('id', 'name', 'last_name', 'email', 'phone_number',
+                  'country', 'city', 'order_date', 'order_status',
+                  'amount_of_productlines', 'total_number_of_products',
+                  'total_price_without_discount', 'total_discount',
+                  'final_total_price', 'order_items')
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -116,6 +121,7 @@ class AboutImageSerializer(serializers.ModelSerializer):
 class AboutUsSerializer(serializers.ModelSerializer):
     """сериализатор для О нас"""
     images = AboutImageSerializer(many=True)
+
     class Meta:
         model = About
         fields = ('headline', 'description', 'images')
@@ -163,8 +169,8 @@ class HitSaleProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'images', 'colors')
+        fields = ('id', 'title', 'discount_price', 'old_price',
+                  'discount', 'size_line', 'favorite', 'images', 'colors')
 
 
 class LatestProductsSerializer(serializers.ModelSerializer):
@@ -174,8 +180,8 @@ class LatestProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'images', 'colors')
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount',
+                  'size_line', 'favorite', 'images', 'colors')
 
 
 class OurAdvantagesSerializer(serializers.ModelSerializer):
@@ -198,7 +204,8 @@ class FooterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Footer
-        fields = ('phone_number', 'logotype', 'text_info', 'numbers_and_social_media')
+        fields = ('phone_number', 'logotype', 'text_info',
+                  'numbers_and_social_media')
 
 
 class CallBackSerializer(serializers.ModelSerializer):
@@ -215,8 +222,6 @@ class SearchProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductLine
-        fields = ('id', 'title', 'discount_price', 'old_price', 'discount', 'size_line',
-                  'favorite', 'colors', 'images')
-
-
+        fields = ('id', 'title', 'discount_price', 'old_price', 'discount',
+                  'size_line', 'favorite', 'colors', 'images')
 
